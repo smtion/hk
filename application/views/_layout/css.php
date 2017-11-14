@@ -20,6 +20,9 @@
 }
 
 /* Common */
+.pointer {
+  cursor: pointer;
+}
 .margin-top-1  {
   margin-top: 15px;
 }
@@ -56,5 +59,19 @@
 }
 .search-form {
 
+}
+
+/* Purchase */
+#purchase-option-list .outer-td {
+  padding: 0;
+}
+#purchase-option-list .inner-td div {
+  padding: 8px;
+}
+#purchase-option-list .inner-td div + div {
+  border-top: 1px solid #ddd;
+}
+#purchase-option-list .inner-td + .inner-td div {
+  border-left: 1px solid #ddd;
 }
 </style>

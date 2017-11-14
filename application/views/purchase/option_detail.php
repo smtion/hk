@@ -23,7 +23,7 @@
         <td>{{ item.name }}</td>
         <td>{{ item.type }}</td>
         <td>{{ parsedValues(item.values) }}</td>
-        <td><span @click="edit(index)">편집</span></td>
+        <td><span class="pointer" @click="edit(index)">편집</span></td>
       </tr>
     </tbody>
   </table>
