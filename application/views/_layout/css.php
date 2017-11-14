@@ -61,6 +61,12 @@
 
 }
 
+/* Login */
+#login {
+  margin: 300px auto;
+  width: 400px;
+}
+
 /* Purchase */
 #purchase-option-list .outer-td {
   padding: 0;

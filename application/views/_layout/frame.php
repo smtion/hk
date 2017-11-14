@@ -10,12 +10,14 @@
 <?php if(is_logged_on()) $this->load->view('_layout/nav'); ?>
 <?php if(is_logged_on()) : ?>
   <div class="content-wrapper">
-  <?php $this->load->view('_layout/sidebar'); ?>
-  <?php $this->load->view('_layout/template'); ?>
+    <?php $this->load->view('_layout/sidebar'); ?>
+    <div class="content container-fluid">
+      <?php $this->load->view('_layout/template'); ?>
+    </div>
   </div>
 <?php else : ?>
   <div class="container">
-  <?php $this->load->view('_layout/template'); ?>
+    <?php $this->load->view('_layout/template'); ?>
   </div>
 <?php endif ?>
 <?php $this->load->view('_layout/footer'); ?>

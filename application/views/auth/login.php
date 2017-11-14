@@ -1,9 +1,17 @@
 <div id="login" class="text-center">
   <div class="well">
-    <form name="frm">
-      <input type="email" name="email" class="form-control" v-model="data.email">
-      <input type="password" name="password" class="form-control" v-model="data.password">
-    </form>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <div class="col-sm-12">
+          <input type="email" name="email" class="form-control" placeholder="Email" v-model="data.email">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-12">
+          <input type="password" name="password" class="form-control" placeholder="Password" v-model="data.password">
+        </div>
+      </div>
+    </div>
 
     <button class="btn btn-danger btn-block" @click="login()">Login</button>
   </div>
