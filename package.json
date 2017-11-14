@@ -1,0 +1,17 @@
+{
+  "name": "erp",
+  "version": "1.0.0",
+  "description": "What is CodeIgniter ###################",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "vue": "^2.5.3",
+    "vuejs-paginate": "^1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

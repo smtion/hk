@@ -1,0 +1,6 @@
+# SetEnv CI_ENV local
+
+RewriteEngine On
+  RewriteCond $1 !^(index\.php|aws-sdk-php|bower_components|node_modules|js|img|upload|robots\.txt|healthcheck\.html|forbidden\.html)
+  RewriteRule ^(.*)$ /index.php/$1 [L]
+  RewriteCond %{HTTP:Authorization} ^(.*)
