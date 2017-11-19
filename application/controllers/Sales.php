@@ -11,7 +11,7 @@ class Sales extends EX_Controller {
 
 	public function index()
 	{
-    $this->currency();
+    redirect('sales/currency');
 	}
 
   public function currency()

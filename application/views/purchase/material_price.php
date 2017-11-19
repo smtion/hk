@@ -1,16 +1,16 @@
-<div id="purchase-option-price">
- <div class="title">옵션 가격</div>
+<div id="purchase-material-price">
+ <div class="title">부자재 가격</div>
 
  <div class="text-right margin-bottom-1">
-   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalOption">등록</button>
+   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">등록</button>
  </div>
 
  <table class="table table-striped table-bordered">
    <thead>
      <tr>
        <th>No</th>
-       <th>옵션명</th>
-       <th>옵션 상세</th>
+       <th>부자재명</th>
+       <th>부자재 상세</th>
        <th>적용 시작일</th>
        <th>적용 종료일</th>
        <th>원가</th>
@@ -50,7 +50,7 @@
            </div>
          </div>
        </td>
-       <td><span class="pointer" @click="add(index)">편집</span></td>
+       <td><span class="pointer" @click="addPrice(index)">편집</span></td>
      </tr>
    </tbody>
  </table>
@@ -69,8 +69,8 @@
  <div class="row">
    <div class="col-sm-offset-2 col-sm-2">
      <select class="form-control" v-model="search">
-       <option value="name">옵션명</option>
-       <option value="details">옵션상세</option>
+       <option value="name">부자재명</option>
+       <option value="details">부자재상세</option>
      </select>
    </div>
    <div class="col-sm-4">
@@ -82,7 +82,7 @@
  </div>
 
  <!-- Modal -->
- <div class="modal fade" id="modalOption" tabindex="-1" role="dialog" aria-labelledby="modalOptionLabel">
+ <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">
    <div class="modal-dialog" role="document">
      <div class="modal-content">
        <div class="modal-header">
@@ -92,7 +92,7 @@
        <div class="modal-body">
          <div class="form-horizontal">
            <div class="form-group">
-             <label class="col-sm-4 control-label">옵션명</label>
+             <label class="col-sm-4 control-label">부자재명</label>
              <div class="col-sm-8">
                <select class="form-control" v-model="option_index" @change="selectOption()">
                  <option value="">선택하세요.</option>
@@ -140,7 +140,7 @@
        <div class="modal-body">
          <div class="form-horizontal">
            <div class="form-group">
-             <label class="col-sm-4 control-label">옵션명</label>
+             <label class="col-sm-4 control-label">부자재명</label>
              <div class="col-sm-8">
                <span class="form-control">{{ selected_option.name }}</span>
              </div>
@@ -181,7 +181,7 @@
 
 <script>
 var vm = new Vue({
- el: '#purchase-option-price',
+ el: '#purchase-material-price',
  data: {
    list: [],
    creatable_list: [],
@@ -201,7 +201,7 @@ var vm = new Vue({
  methods: {
    init: function () {
      if (!vm.paginate.page) vm.paginate.page = 1;
-     $('#modalOption').on('hidden.bs.modal', function () {
+     $('#modalCreate').on('hidden.bs.modal', function () {
        vm.reset();
      });
      $('#modalAdd').on('hidden.bs.modal', function () {
@@ -233,23 +233,12 @@ var vm = new Vue({
    selectOption: function () {
      vm.selected_option = vm.creatable_list[vm.option_index];
    },
-   add: function (index) {
-     vm.selected_option = vm.list[index]
-    //  vm.data.id = vm.selected_option.id;
-     //
-    //  var params = makeParams({
-    //    id: vm.data.id
-    //  });
-    //  axios.get('/api/purchase/option_price_editable?' + params).then(function (response) {
-    //    if (response.status == 200) {
-    //      vm.selected_price = response.data.list;
-    //    }
-    //  });
-
+   addPrice: function (index) {
+     vm.selected_option = vm.list[index];
      $('#modalAdd').modal('show');
    },
    getCreatableList: function () {
-     axios.get('/api/purchase/option_price_creatable').then(function (response) {
+     axios.get('/api/purchase/material_price_creatable').then(function (response) {
        if (response.status == 200) {
          vm.creatable_list = response.data.list;
        }
@@ -263,7 +252,7 @@ var vm = new Vue({
        search: vm.search,
        keyword: vm.keyword,
      });
-     axios.get('/api/purchase/option_price?' + params).then(function (response) {
+     axios.get('/api/purchase/material_price?' + params).then(function (response) {
        if (response.status == 200) {
          vm.list = response.data.list;
          vm.paginate = response.data.paginate;
@@ -274,10 +263,10 @@ var vm = new Vue({
      vm.data.id = vm.selected_option.id;
      if (vm.selected_option.prices) vm.data.prices = vm.data.prices.concat(vm.selected_option.prices);
 
-     axios.patch('/api/purchase/option_price', vm.data).then(function (response) {
+     axios.patch('/api/purchase/material_price', vm.data).then(function (response) {
        if (response.status == 200) {
          alert('등록되었습니다.');
-         $('#modalOption').modal('hide');
+         $('#modalCreate').modal('hide');
          $('#modalAdd').modal('hide');
          vm.reload();
        }

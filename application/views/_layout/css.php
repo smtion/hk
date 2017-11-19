@@ -1,6 +1,10 @@
 <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
 
 <style>
+* {
+  word-break: keep-all;
+}
+
 .navbar {
   margin-bottom: 0;
 }
@@ -68,16 +72,21 @@
 }
 
 /* Purchase */
-#purchase-option-list .outer-td {
+.table tr, th {
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+.table .outer-td {
   padding: 0;
 }
-#purchase-option-list .inner-td div {
+.table .inner-td div {
   padding: 8px;
 }
-#purchase-option-list .inner-td div + div {
+.table .inner-td > div + div {
   border-top: 1px solid #ddd;
 }
-#purchase-option-list .inner-td + .inner-td div {
+.table .inner-td + .inner-td div {
   border-left: 1px solid #ddd;
 }
 </style>

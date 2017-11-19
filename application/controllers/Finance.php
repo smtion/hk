@@ -11,7 +11,7 @@ class Finance extends EX_Controller {
 
 	public function index()
 	{
-    $this->sample();
+    redirect('finance/sample');
 	}
 
   public function sample()

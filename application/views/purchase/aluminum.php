@@ -1,6 +1,6 @@
 <div id="purchase-aluminum">
-  <h4>알루미늄 가격</h4>
-
+  <div class="title">알루미늄 가격</div>
+  
   <div class="row">
     <div class="col-sm-4">
       <select name="" class="form-control" v-model="type" @change="selectType()">
@@ -33,7 +33,6 @@ var vm = new Vue({
       vm.value = new Date().getMonth() + 1;
     },
     selectType: function () {
-      console.log(vm.type);
       vm.makeItems();
     },
     makeItems: function () {
@@ -53,8 +52,6 @@ var vm = new Vue({
           vm.items.push({value: i, text: i + '월'});
         }
       }
-
-      console.log(vm.items)
     }
   }
 });

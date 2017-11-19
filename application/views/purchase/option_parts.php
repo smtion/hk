@@ -1,4 +1,4 @@
-<div id="purchase-option-detail">
+<div id="purchase-option-parts">
   <div class="title">옵션 상세</div>
 
   <div class="text-right margin-bottom-1">
@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <tr v-for="(item, index) in list">
-        <td>{{ item.id }}</td>
+        <td>{{ getNo(index) }}</td>
         <td>{{ item.code }}</td>
         <td>{{ item.name }}</td>
         <td>{{ item.type }}</td>
@@ -114,7 +114,7 @@
 
 <script>
 var vm = new Vue({
-  el: '#purchase-option-detail',
+  el: '#purchase-option-parts',
   data: {
     list: [],
     data: {
@@ -146,6 +146,9 @@ var vm = new Vue({
       vm.getList(vm.paginate.page);
       vm.getOptionName();
     },
+    getNo: function (i) {
+      return (vm.paginate.page - 1) * vm.paginate.limit + i + 1;
+    },
     parsedValues: function (e) {
       var d = JSON.parse(e);
       return d.join(', ');
@@ -167,7 +170,7 @@ var vm = new Vue({
       vm.data.values.splice(index, 1);
     },
     getOptionName: function () {
-      axios.get('/api/purchase/option_name').then(function (response) {
+      axios.get('/api/purchase/option_parts_name').then(function (response) {
         if (response.status == 200) {
           vm.options = response.data.list;
         }
@@ -183,7 +186,7 @@ var vm = new Vue({
         sort: vm.sort,
         direction: vm.direction,
       });
-      axios.get('/api/purchase/option_detail?' + params).then(function (response) {
+      axios.get('/api/purchase/option_parts?' + params).then(function (response) {
         if (response.status == 200) {
           vm.list = response.data.list;
           vm.paginate = response.data.paginate;
@@ -193,7 +196,7 @@ var vm = new Vue({
     create: function () {
       vm.data.option = isNaN(parseInt(vm.option_index)) ? {} : vm.options[vm.option_index];
 
-      axios.post('/api/purchase/option_detail', vm.data).then(function (response) {
+      axios.post('/api/purchase/option_parts', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');
           $('#modalOption').modal('hide');
@@ -204,7 +207,7 @@ var vm = new Vue({
     update: function () {
       // vm.data.option = isNaN(parseInt(vm.option_index)) ? {} : vm.options[vm.option_index];
 
-      axios.patch('/api/purchase/option_detail', vm.data).then(function (response) {
+      axios.patch('/api/purchase/option_parts', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');
           $('#modalOption').modal('hide');

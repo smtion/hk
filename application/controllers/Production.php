@@ -11,7 +11,7 @@ class Production extends EX_Controller {
 
 	public function index()
 	{
-    $this->sample();
+    redirect('production/sample');
 	}
 
   public function sample()

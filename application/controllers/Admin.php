@@ -11,7 +11,7 @@ class Admin extends EX_Controller {
 
 	public function index()
 	{
-    $this->users();
+    redirect('admin/users');
 	}
 
   public function users()

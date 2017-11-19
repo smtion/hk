@@ -6,7 +6,23 @@
 <script>
 Vue.component('paginate', VuejsPaginate);
 
+$(document).ready(function () {
+  // Set the sidebar .active class automatically
+  $('.sidebar .list-group-item[href="' + location.pathname + '"]').addClass('active');
 
+  // $(".sidebar .list-group-item").each(function (i, obj) {
+  //   if ($(obj).attr('href') == location.pathname) {
+  //     $(obj).addClass('active');
+  //     return false;
+  //   }
+  // });
+  // })();
+});
+
+
+//-----------------------------------------------------------------------
+// Global helper functions
+//-----------------------------------------------------------------------
 function makeParams(items) {
   var arr = [];
 
