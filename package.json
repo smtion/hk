@@ -6,6 +6,8 @@
   "dependencies": {
     "axios": "^0.17.1",
     "vue": "^2.5.3",
+    "vue-bootstrap-datetimepicker": "^4.1.0",
+    "vuejs-datepicker": "^0.9.20",
     "vuejs-paginate": "^1.4.0"
   },
   "devDependencies": {},

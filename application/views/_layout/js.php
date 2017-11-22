@@ -1,11 +1,19 @@
 <script src="/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="/node_modules/vue/dist/vue.min.js"></script>
+
+<script src="/node_modules/vue/dist/vue.js"></script>
 <script src="/node_modules/axios/dist/axios.min.js"></script>
 <script src="/node_modules/vuejs-paginate/dist/index.js"></script>
+
+<script src="/node_modules/moment/min/moment.min.js"></script>
+<script src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/node_modules/vue-bootstrap-datetimepicker/dist/vue-bootstrap-datetimepicker.min.js"></script>
+
+
 <script>
 Vue.component('paginate', VuejsPaginate);
-
+Vue.component('date-picker', VueBootstrapDatetimePicker.default);
+Vue.config.debug = true;
 $(document).ready(function () {
   // Set the sidebar .active class automatically
   $('.sidebar .list-group-item[href="' + location.pathname + '"]').addClass('active');

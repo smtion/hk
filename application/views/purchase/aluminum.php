@@ -1,21 +1,20 @@
 <div id="purchase-aluminum">
   <div class="title">알루미늄 가격</div>
-  
+
   <div class="row">
-    <div class="col-sm-4">
-      <select name="" class="form-control" v-model="type" @change="selectType()">
-        <option value="day">Day</option>
-        <option value="week">Week</option>
-        <option value="month">Month</option>
-        <option value="year">Year</option>
+    <div class="col-sm-2">
+      <select class="form-control" v-model="data.year">
+        <option v-for="item in years" :value="item.value">{{ item.text }}</option>
       </select>
     </div>
-    <div class="col-sm-4">
-      <select name="" class="form-control" v-model="value">
-        <option v-for="item in items" :value="item.value">{{ item.text }}</option>
+    <div class="col-sm-2">
+      <select class="form-control" v-model="data.month">
+        <option v-for="item in months" :value="item.value">{{ item.text }}</option>
       </select>
     </div>
-    <div class="col-sm-4"></div>
+    <div class="col-sm-2">
+      <button class="btn btn-primary" @click="search()">검색</button>
+    </div>
   </div>
 </div>
 
@@ -23,35 +22,27 @@
 var vm = new Vue({
   el: '#purchase-aluminum',
   data: {
-    type: 'month',
-    value: '',
-    items: []
+    years: [],
+    months: [],
+    data: {},
   },
   methods: {
     init: function() {
-      vm.makeItems();
-      vm.value = new Date().getMonth() + 1;
+      vm.make();
     },
-    selectType: function () {
-      vm.makeItems();
-    },
-    makeItems: function () {
-      var y = new Date().getFullYear();
-      var m = new Date().getFullYear();
+    make: function () {
+      vm.data.year = new Date().getFullYear();
+      vm.data.month = new Date().getMonth() + 1;
 
-      if (vm.type == 'year') {
-        for (i = y; i > 2010; i--) {
-          vm.items.push({value: i, text: i + '년'});
-        }
-      } else if (vm.type == 'month') {
-        for (i = 1; i <= 12; i++) {
-          vm.items.push({value: i, text: i + '월'});
-        }
-      } else if (vm.type == 'day') {
-        for (i = 1; i <= 12; i++) {
-          vm.items.push({value: i, text: i + '월'});
-        }
+      for (i = vm.data.year; i >= 2017; i--) {
+        vm.years.push({value: i, text: i + '년'});
       }
+      for (i = 1; i <= 12; i++) {
+        vm.months.push({value: i, text: i + '월'});
+      }
+    },
+    search: function () {
+
     }
   }
 });
