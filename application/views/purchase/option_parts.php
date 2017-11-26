@@ -147,7 +147,7 @@ var vm = new Vue({
       vm.getOptionName();
     },
     getNo: function (i) {
-      return (vm.paginate.page - 1) * vm.paginate.limit + i + 1;
+      return vm.paginate.total - ((vm.paginate.page - 1) * vm.paginate.limit) - i;
     },
     parsedValues: function (e) {
       var d = JSON.parse(e);

@@ -165,7 +165,7 @@ var vm = new Vue({
       vm.getList(vm.paginate.page);
     },
     getNo: function (i) {
-      return (vm.paginate.page - 1) * vm.paginate.limit + i + 1;
+      return vm.paginate.total - ((vm.paginate.page - 1) * vm.paginate.limit) - i;
     },
     parseJson: function (s) {
       return JSON.parse(s);

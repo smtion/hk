@@ -16,6 +16,11 @@ function get_user_name()
   return get_session_data('user_name');
 }
 
+function get_role()
+{
+  return get_session_data('role');
+}
+
 function get_timezone()
 {
   return get_session_data('timezone');
@@ -43,7 +48,7 @@ function get_partner_id()
 }
 
 function is_logged_on()
-{ 
+{
   return strlen(get_user_id()) > 0;
 }
 
@@ -111,6 +116,6 @@ function fz_float($str, $len)
       $str .= '0';
     }
   }
-  
+
   return $str;
 }

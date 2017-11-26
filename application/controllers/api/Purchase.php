@@ -30,7 +30,7 @@ class Purchase extends REST_Controller {
     }
 
     $total = $this->db->count_all_results('HK_option_parts');
-    $list = $this->db->get('HK_option_parts', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_option_parts', $limit, $offset)->result_array();
 
     $response = [
       'paginate' => [
@@ -99,7 +99,7 @@ class Purchase extends REST_Controller {
     }
 
     $total = $this->db->count_all_results('HK_option_list');
-    $list = $this->db->get('HK_option_list', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_option_list', $limit, $offset)->result_array();
 
     $response = [
       'paginate' => [
@@ -162,7 +162,7 @@ class Purchase extends REST_Controller {
     $this->db->stop_cache();
 
     $total = $this->db->count_all_results('HK_option_list');
-    $list = $this->db->get('HK_option_list', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_option_list', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['details'] = json_decode($item['details']);
@@ -309,7 +309,7 @@ class Purchase extends REST_Controller {
     }
 
     $total = $this->db->count_all_results('HK_material_parts');
-    $list = $this->db->get('HK_material_parts', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_material_parts', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['values'] = json_decode($item['values']);
@@ -383,7 +383,7 @@ class Purchase extends REST_Controller {
     }
 
     $total = $this->db->count_all_results('HK_material_list');
-    $list = $this->db->get('HK_material_list', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_material_list', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['details'] = json_decode($item['details']);
@@ -457,7 +457,7 @@ class Purchase extends REST_Controller {
     $this->db->stop_cache();
 
     $total = $this->db->count_all_results('HK_material_list');
-    $list = $this->db->get('HK_material_list', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_material_list', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['details'] = json_decode($item['details']);
@@ -533,7 +533,7 @@ class Purchase extends REST_Controller {
     }
 
     $total = $this->db->count_all_results('HK_cost_parts');
-    $list = $this->db->get('HK_cost_parts', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_cost_parts', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['values'] = json_decode($item['values']);
@@ -607,7 +607,7 @@ class Purchase extends REST_Controller {
     }
 
     $total = $this->db->count_all_results('HK_cost_list');
-    $list = $this->db->get('HK_cost_list', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_cost_list', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['details'] = json_decode($item['details']);
@@ -681,7 +681,7 @@ class Purchase extends REST_Controller {
     $this->db->stop_cache();
 
     $total = $this->db->count_all_results('HK_cost_list');
-    $list = $this->db->get('HK_cost_list', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_cost_list', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['details'] = json_decode($item['details']);
@@ -757,7 +757,7 @@ class Purchase extends REST_Controller {
     }
 
     $total = $this->db->count_all_results('HK_products');
-    $list = $this->db->get('HK_products', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_products', $limit, $offset)->result_array();
 
     $response = [
       'paginate' => [
@@ -807,7 +807,7 @@ class Purchase extends REST_Controller {
     $this->db->stop_cache();
 
     $total = $this->db->count_all_results('HK_products');
-    $list = $this->db->get('HK_products', $limit, $offset)->result_array();
+    $list = $this->db->order_by('id desc')->get('HK_products', $limit, $offset)->result_array();
 
     $list = array_map(function ($item) {
       $item['prices'] = json_decode($item['prices']);

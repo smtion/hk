@@ -46,7 +46,7 @@
        <td class="outer-td">
          <div class="inner-td" >
            <div v-for="price in item.prices.slice(0, 2)">
-             {{ parseInt(price.price).toLocaleString() }}
+             {{ price.price | number }}
            </div>
          </div>
        </td>
@@ -163,7 +163,7 @@
                <tr v-for="item in selected_option.prices">
                  <td>{{ item.start_date }}</td>
                  <td>{{ item.end_date }}</td>
-                 <td>{{ (item.price).toLocaleString() }}</td>
+                 <td>{{ item.price | number }}</td>
                </tr>
              </tbody>
            </table>
@@ -222,7 +222,7 @@ var vm = new Vue({
      vm.getCreatableList();
    },
    getNo: function (i) {
-     return (vm.paginate.page - 1) * vm.paginate.limit + i + 1;
+     return vm.paginate.total - ((vm.paginate.page - 1) * vm.paginate.limit) - i;
    },
    getPrices: function (p) {
      if (typeof p == 'object') return p.slice(0, 1);
@@ -271,6 +271,30 @@ var vm = new Vue({
      });
    },
    create: function () {
+     if (!vm.selected_option.id) {
+       alert('등록할 옵션을 선택하세요.');
+       return;
+     }
+
+     if (!vm.data.prices[0]['start_date'] || !vm.data.prices[0]['end_date'] || !vm.data.prices[0]['price']) {
+       alert('입력값을 확인하세요.');
+       return;
+     }
+     if (vm.data.prices[0]['start_date'] == today()) {
+       alert('적용시작일은 당일로 설정할 수 없습니다.')
+       return;
+     }
+
+     var validate = true;
+     vm.selected_option.prices.forEach(function (price) {
+       if (price.end_date >= vm.data.prices[0]['start_date']) {
+         alert('적용시작일은 ' + price.end_date + ' 이후로만 가능합니다.');
+         validate = false;
+         return;
+       }
+     });
+     if (!validate) return;
+
      vm.data.id = vm.selected_option.id;
      if (vm.selected_option.prices) vm.data.prices = vm.data.prices.concat(vm.selected_option.prices);
 

@@ -14,9 +14,20 @@
 Vue.component('paginate', VuejsPaginate);
 Vue.component('date-picker', VueBootstrapDatetimePicker.default);
 Vue.config.debug = true;
+Vue.filter('product_type', function (value) {
+  var data = ['', 'Per\'f', 'Grating', 'Blind'];
+  return data[value];
+});
+Vue.filter('number', function (value) {
+  value = parseInt(value);
+  if (value) return value.toLocaleString();
+  else return value;
+});
+
 $(document).ready(function () {
   // Set the sidebar .active class automatically
-  $('.sidebar .list-group-item[href="' + location.pathname + '"]').addClass('active');
+  var path = location.pathname.match(/(\/([^\/.]*)(\/([^\/.]*)))/)[0];
+  $('.sidebar .list-group-item[href^="' + path + '"]').addClass('active');
 
   // $(".sidebar .list-group-item").each(function (i, obj) {
   //   if ($(obj).attr('href') == location.pathname) {
@@ -31,6 +42,9 @@ $(document).ready(function () {
 //-----------------------------------------------------------------------
 // Global helper functions
 //-----------------------------------------------------------------------
+function today() {
+  return new Date().toLocaleDateString('ko-KR').replace(/\. /g, '-').replace(/\./g, '');
+}
 function makeParams(items) {
   var arr = [];
 
