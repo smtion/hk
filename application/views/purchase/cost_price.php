@@ -275,14 +275,16 @@ var vm = new Vue({
      }
 
      var validate = true;
-     vm.selected_option.prices.forEach(function (price) {
-       if (price.end_date >= vm.data.prices[0]['start_date']) {
-         alert('적용시작일은 ' + price.end_date + ' 이후로만 가능합니다.');
-         validate = false;
-         return;
-       }
-     });
-     if (!validate) return;
+     if (vm.selected_option.prices) {
+       vm.selected_option.prices.forEach(function (price) {
+         if (price.end_date >= vm.data.prices[0]['start_date']) {
+           alert('적용시작일은 ' + price.end_date + ' 이후로만 가능합니다.');
+           validate = false;
+           return;
+         }
+       });
+       if (!validate) return;
+     }
 
      vm.data.id = vm.selected_option.id;
      if (vm.selected_option.prices) vm.data.prices = vm.data.prices.concat(vm.selected_option.prices);
