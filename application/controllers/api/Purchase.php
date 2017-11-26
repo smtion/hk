@@ -155,18 +155,18 @@ class Purchase extends REST_Controller {
     $offset = ($page - 1) * $limit;
 
     $this->db->start_cache();
-    $this->db->where('prices IS NOT NULL');
+    $this->db->select('o.*')->from('HK_option o')->join('HK_option_price p', 'o.id = p.option_id')->group_by('p.option_id');
     if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->like($search, $keyword);
+      $this->db->like('o.'.$search, $keyword);
     }
     $this->db->stop_cache();
 
-    $total = $this->db->count_all_results('HK_option_list');
-    $list = $this->db->order_by('id desc')->get('HK_option_list', $limit, $offset)->result_array();
+    $total = $this->db->count_all_results();
+    $list = $this->db->order_by('o.id desc')->get(null, $limit, $offset)->result_array();
+    $this->db->flush_cache();
 
     $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      $item['prices'] = json_decode($item['prices']);
+      $item['prices'] = $this->db->where('option_id', $item['id'])->order_by('start_date desc')->get('HK_option_price')->result_array();
       return $item;
     }, $list);
 

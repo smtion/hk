@@ -23,6 +23,10 @@ Vue.filter('number', function (value) {
   if (value) return value.toLocaleString();
   else return value;
 });
+Vue.filter('nbsp', function (value) {
+  if (!value) return '&nbsp;';
+  else return value;
+});
 
 $(document).ready(function () {
   // Set the sidebar .active class automatically
