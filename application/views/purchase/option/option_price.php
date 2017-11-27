@@ -1,5 +1,5 @@
 <div id="purchase-option-price">
- <div class="title">옵션 목록</div>
+ <div class="title">옵션 가격</div>
 
  <div class="text-right margin-bottom-1">
    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalOption">등록</button>
@@ -50,7 +50,7 @@
            </div>
          </div>
        </td>
-       <td><span class="pointer" @click="edit(index)">편집</span></td>
+       <td><span class="pointer" @click="add(index)">편집</span></td>
      </tr>
    </tbody>
  </table>
@@ -109,15 +109,15 @@
            <div class="form-group text-center">
              <div class="col-sm-4">
                <label>적용 시작일</label>
-               <input type="date" class="form-control" v-model="data.start_date">
+               <input type="date" class="form-control" v-model="data.prices[0].start_date">
              </div>
              <div class="col-sm-4">
                <label>적용 종료일</label>
-               <input type="date" class="form-control" v-model="data.end_date">
+               <input type="date" class="form-control" v-model="data.prices[0].end_date">
              </div>
              <div class="col-sm-4">
                <label>원가 (원)</label>
-               <input type="number" class="form-control" v-model="data.price">
+               <input type="number" class="form-control" v-model="data.prices[0].price">
              </div>
            </div>
          </div>
@@ -156,14 +156,14 @@
              </thead>
              <tbody>
                <tr v-show="is_add">
-                 <td><input type="date" class="form-control" v-model="data.start_date"></td>
-                 <td><input type="date" class="form-control" v-model="data.end_date"></td>
-                 <td><input type="number" class="form-control" v-model="data.price"></td>
+                 <td><input type="date" class="form-control" v-model="data.prices[0].start_date"></td>
+                 <td><input type="date" class="form-control" v-model="data.prices[0].end_date"></td>
+                 <td><input type="number" class="form-control" v-model="data.prices[0].price"></td>
                </tr>
-               <tr v-for="item in selected_price">
+               <tr v-for="item in selected_option.prices">
                  <td>{{ item.start_date }}</td>
                  <td>{{ item.end_date }}</td>
-                 <td>{{ (item.price).toLocaleString() }}</td>
+                 <td>{{ item.price | number }}</td>
                </tr>
              </tbody>
            </table>
@@ -188,7 +188,9 @@ var vm = new Vue({
    selected_option: {},
    selected_price: [],
    is_add: false,
-   data: {},
+   data: {
+     prices: [{}],
+   },
    options: [],
    option_detail2: [],
    option_index: '',
@@ -208,7 +210,9 @@ var vm = new Vue({
      vm.reload();
    },
    reset: function () {
-     vm.data = {};
+     vm.data = {
+       prices: [{}],
+     };
      vm.selected_option = {};
      vm.is_add = false;
    },
@@ -220,24 +224,27 @@ var vm = new Vue({
    getNo: function (i) {
      return vm.paginate.total - ((vm.paginate.page - 1) * vm.paginate.limit) - i;
    },
+   getPrices: function (p) {
+     if (typeof p == 'object') return p.slice(0, 1);
+   },
    goPage: function (page) {
      vm.getList(page);
    },
    selectOption: function () {
      vm.selected_option = vm.creatable_list[vm.option_index];
    },
-   edit: function (index) {
+   add: function (index) {
      vm.selected_option = vm.list[index]
-     vm.data.opt_id = vm.selected_option.opt_id;
-
-     var params = makeParams({
-       opt_id: vm.data.opt_id
-     });
-     axios.get('/api/purchase/option_price_editable?' + params).then(function (response) {
-       if (response.status == 200) {
-         vm.selected_price = response.data.list;
-       }
-     });
+    //  vm.data.id = vm.selected_option.id;
+     //
+    //  var params = makeParams({
+    //    id: vm.data.id
+    //  });
+    //  axios.get('/api/purchase/option_price_editable?' + params).then(function (response) {
+    //    if (response.status == 200) {
+    //      vm.selected_price = response.data.list;
+    //    }
+    //  });
 
      $('#modalAdd').modal('show');
    },
@@ -245,23 +252,6 @@ var vm = new Vue({
      axios.get('/api/purchase/option_price_creatable').then(function (response) {
        if (response.status == 200) {
          vm.creatable_list = response.data.list;
-       }
-     });
-   },
-   getOptionDetail2: function () {
-     var params = makeParams({
-       'name': vm.options[vm.option_index]['name']
-     });
-     axios.get('/api/purchase/option_detail2?' + params).then(function (response) {
-       if (response.status == 200) {
-         vm.option_detail2 = response.data.list;
-
-         vm.data.name = vm.options[vm.option_index]['name'];
-         vm.data.details = {};
-         vm.option_detail2.map(function (item, index) {
-           // vm.data.details[index] = {};
-           vm.data.details[item.type] = '';
-         });
        }
      });
    },
@@ -281,22 +271,38 @@ var vm = new Vue({
      });
    },
    create: function () {
-     vm.data.opt_id = vm.selected_option.opt_id;
+     if (!vm.selected_option.id) {
+       alert('등록할 옵션을 선택하세요.');
+       return;
+     }
 
-     axios.post('/api/purchase/option_price', vm.data).then(function (response) {
-       if (response.status == 201) {
+     if (!vm.data.prices[0]['start_date'] || !vm.data.prices[0]['end_date'] || !vm.data.prices[0]['price']) {
+       alert('입력값을 확인하세요.');
+       return;
+     }
+     if (vm.data.prices[0]['start_date'] == today()) {
+       alert('적용시작일은 당일로 설정할 수 없습니다.')
+       return;
+     }
+
+     var validate = true;
+     vm.selected_option.prices.forEach(function (price) {
+       if (price.end_date >= vm.data.prices[0]['start_date']) {
+         alert('적용시작일은 ' + price.end_date + ' 이후로만 가능합니다.');
+         validate = false;
+         return;
+       }
+     });
+     if (!validate) return;
+
+     vm.data.id = vm.selected_option.id;
+     if (vm.selected_option.prices) vm.data.prices = vm.data.prices.concat(vm.selected_option.prices);
+
+     axios.patch('/api/purchase/option_price', vm.data).then(function (response) {
+       if (response.status == 200) {
          alert('등록되었습니다.');
          $('#modalOption').modal('hide');
          $('#modalAdd').modal('hide');
-         vm.reload();
-       }
-     });
-   },
-   update: function () {
-     axios.patch('/api/purchase/option_list', vm.data).then(function (response) {
-       if (response.status == 200) {
-         alert('변경되었습니다.');
-         $('#modalOption').modal('hide');
          vm.reload();
        }
      });

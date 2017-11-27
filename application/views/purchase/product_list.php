@@ -1,4 +1,4 @@
- <div id="purchase-product-list">
+<div id="purchase-product-list">
   <div class="title">제품 목록</div>
 
   <div class="text-right margin-bottom-1">

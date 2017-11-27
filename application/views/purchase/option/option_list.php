@@ -1,4 +1,4 @@
-<div id="purchase-option-list">
+ <div id="purchase-option-list">
   <div class="title">옵션 목록</div>
 
   <div class="text-right margin-bottom-1">
@@ -23,7 +23,7 @@
           <div class="clearfix">
             <div class="pull-left inner-td" v-for="(v, k) in parseJson(item.details)" v-bind:style="{width: 100 / Object.keys(parseJson(item.details)).length + '%'}">
               <div>{{ k }}</div>
-              <div>{{ v ? v : '&nbsp;' }}</div>
+              <div>{{ v }}</div>
             </div>
           </div>
         </td>
