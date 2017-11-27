@@ -1,4 +1,4 @@
- <div id="purchase-option-list">
+<div id="purchase-option-list">
   <div class="title">옵션 목록</div>
 
   <div class="text-right margin-bottom-1">

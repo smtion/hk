@@ -20,11 +20,13 @@ Vue.filter('product_type', function (value) {
 });
 Vue.filter('number', function (value) {
   value = parseInt(value);
-  if (value) return value.toLocaleString();
+  if (isNaN(value)) return 0;
+  else if (value === null) return 0;
+  else if (value) return value.toLocaleString();
   else return value;
 });
 Vue.filter('nbsp', function (value) {
-  if (!value) return '&nbsp;';
+  if (!value) return '<span></span>';
   else return value;
 });
 

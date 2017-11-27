@@ -22,7 +22,7 @@
       <tr v-for="(item, index) in list">
         <td>{{ getNo(index) }}</td>
         <td>{{ item.model }}</td>
-        <td>{{ item.partner }}</td>
+        <td>{{ item.corp_name }}</td>
         <td class="outer-td">
           <div class="inner-td">
             <div v-for="price in item.prices.slice(0, 2)">
@@ -40,18 +40,18 @@
         <td class="outer-td">
           <div class="inner-td">
             <div v-for="price in item.prices.slice(0, 2)">
-              {{ parseInt(price.sprice == null ? 0 : price.sprice).toLocaleString() }}
+              {{ price.price | number }}
             </div>
           </div>
         </td>
         <td class="outer-td">
           <div class="inner-td">
             <div v-for="price in item.prices.slice(0, 2)">
-             {{ parseInt(price.price == null ? 0 : price.price).toLocaleString() }}
+             {{ price.sales_price | number }}
             </div>
           </div>
         </td>
-        <td><span class="pointer" @click="add(index)">편집</span></td>
+        <td><span class="pointer" @click="edit(index)">편집</span></td>
       </tr>
     </tbody>
   </table>
@@ -92,24 +92,21 @@
         <div class="modal-body">
           <div class="form-horizontal">
             <div class="form-group">
-              <label class="col-sm-4 control-label">모델명</label>
+              <label class="col-sm-4 control-label">고객사</label>
               <div class="col-sm-8">
-                <select class="form-control" v-model="option_index" @change="selectOption()">
+                <select class="form-control" v-model="indexCustomer" @change="selectCustomer()">
                   <option value="">선택하세요.</option>
-                  <option v-for="(item, index) in creatable_list" :value="index">{{ item.model }}</option>
+                  <option v-for="(item, index) in customers" :value="index">{{ item.corp_name }}</option>
                 </select>
               </div>
             </div>
-            <div class="form-group" v-for="(v, k) in selected_option.details" v-show="selected_option">
-              <label class="col-sm-4 control-label">{{ k }}</label>
-              <div class="col-sm-8">
-                <span class="form-control">{{ v }}</span>
-              </div>
-            </div>
             <div class="form-group">
-              <label class="col-sm-4 control-label">고객사</label>
+              <label class="col-sm-4 control-label">모델명</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="data.partner">
+                <select class="form-control" v-model="indexProduct" @change="selectProduct()">
+                  <option value="">선택하세요.</option>
+                  <option v-for="(item, index) in creatableList" :value="index">{{ item.model }}</option>
+                </select>
               </div>
             </div>
           </div>
@@ -123,7 +120,7 @@
   </div>
 
   <!-- Modal -->
-  <div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="modalAddLabel">
+  <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEditLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -135,7 +132,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">모델명</label>
               <div class="col-sm-8">
-                <span class="form-control">{{ selected_option.model }}</span>
+                <span class="form-control">{{ selectedProduct.model }}</span>
               </div>
             </div>
             <table class="table table-striped table-bordered">
@@ -148,18 +145,18 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in selected_option.prices">
+                <tr v-for="(item, index) in selectedProduct.prices">
                   <td>{{ item.start_date }}</td>
                   <td>{{ item.end_date }}</td>
-                  <td>{{ (item.price).toLocaleString() }}</td>
-                  <td><input type="number" class="form-control" v-model="data.prices[index].sprice"></td>
+                  <td>{{ item.price | number }}</td>
+                  <td><input type="number" class="form-control" v-model="data2[index].sales_price"></td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
-            <button type="button" class="btn btn-primary" @click="create()">저장</button>
+            <button type="button" class="btn btn-primary" @click="create2()">저장</button>
           </div>
         </div>
       </div>
@@ -172,12 +169,14 @@ var vm = new Vue({
   el: '#sales-product',
   data: {
     list: [],
-    creatable_list: [],
-    selected_option: {},
-    data: {
-      prices: [{}],
-    },
-    option_index: '',
+    customers: [],
+    creatableList: [],
+    indexCustomer: '',
+    selectedCustomer: {},
+    indexProduct: '',
+    selectedProduct: {},
+    data: {},
+    data2: [],
     search: 'model',
     keyword: '',
     paginate: {},
@@ -188,43 +187,74 @@ var vm = new Vue({
       $('#modalCreate').on('hidden.bs.modal', function () {
         vm.reset();
       });
-      $('#modalAdd').on('hidden.bs.modal', function () {
+      $('#modalEdit').on('hidden.bs.modal', function () {
         vm.reset();
       });
       vm.reload();
     },
     reset: function () {
-      vm.data = {
-        prices: [{}],
-      };
-      vm.selected_option = {};
-      vm.option_index = '';
+      vm.data = {};
+      vm.data2 = [];
+      vm.indexCustomer = '';
+      vm.selectedCustomer = {};
+      vm.indexProduct = '';
+      vm.selectedProduct = {};
     },
     reload: function () {
       vm.reset();
       vm.getList(vm.paginate.page);
-      vm.getCreatableList();
+      vm.getCustomer();
     },
     getNo: function (i) {
       return vm.paginate.total - ((vm.paginate.page - 1) * vm.paginate.limit) - i;
     },
-    getPrices: function (p) {
-      if (typeof p == 'object') return p.slice(0, 1);
-    },
     goPage: function (page) {
       vm.getList(page);
     },
-    selectOption: function () {
-      vm.data = vm.selected_option = vm.creatable_list[vm.option_index];
+    selectCustomer: function () {
+      if (vm.indexCustomer !== '') {
+        vm.selectedCustomer = vm.customers[vm.indexCustomer];
+        vm.data.customer_id = vm.selectedCustomer.id;
+        vm.getCreatableList(vm.data.customer_id);
+      } else {
+        vm.reset();
+      }
     },
-    add: function (index) {
-      vm.data = vm.selected_option = JSON.parse(JSON.stringify(vm.list[index]));
-      $('#modalAdd').modal('show');
+    selectProduct: function () {
+      if (vm.indexProduct !== '') {
+        vm.selectedProduct = vm.creatableList[vm.indexProduct];
+        vm.data.product_id = vm.selectedProduct.id;
+      } else {
+        vm.indexProduct = '';
+        vm.selectedProduct = {};
+        vm.data.product_id = '';
+      }
     },
-    getCreatableList: function () {
-      axios.get('/api/sales/product_creatable').then(function (response) {
+    edit: function (index) {
+      vm.selectedProduct = JSON.parse(JSON.stringify(vm.list[index]));
+      if (vm.selectedProduct.prices) {
+        vm.selectedProduct.prices.forEach(function (item) {
+          vm.data2.push({
+            product_customer_id: vm.selectedProduct.id,
+            product_id: vm.selectedProduct.product_id,
+            product_price_id: item.id,
+            sales_price: item.sales_price,
+          });
+        });
+      }
+      $('#modalEdit').modal('show');
+    },
+    getCustomer: function () {
+      axios.get('/api/sales/customer_creatable').then(function (response) {
         if (response.status == 200) {
-          vm.creatable_list = response.data.list;
+          vm.customers = response.data.list;
+        }
+      });
+    },
+    getCreatableList: function (customer_id) {
+      axios.get('/api/sales/product_creatable/' + customer_id).then(function (response) {
+        if (response.status == 200) {
+          vm.creatableList = response.data.list;
         }
       });
     },
@@ -244,11 +274,27 @@ var vm = new Vue({
       });
     },
     create: function () {
-      axios.patch('/api/sales/product', vm.data).then(function (response) {
-        if (response.status == 200) {
+      if (!vm.data.customer_id) {
+        alert('고객사를 선택하세요.');
+        return;
+      } else if (!vm.data.product_id) {
+        alert('부자재를 선택하세요.');
+        return;
+      }
+
+      axios.post('/api/sales/product', vm.data).then(function (response) {
+        if (response.status == 201) {
           alert('등록되었습니다.');
           $('#modalCreate').modal('hide');
-          $('#modalAdd').modal('hide');
+          vm.reload();
+        }
+      });
+    },
+    create2: function () {
+      axios.put('/api/sales/product_customer_price', vm.data2).then(function (response) {
+        if (response.status == 200) {
+          alert('등록되었습니다.');
+          $('#modalEdit').modal('hide');
           vm.reload();
         }
       });
