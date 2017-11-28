@@ -37,6 +37,12 @@
 .margin-top-between-1 + .margin-top-between-1 {
   margin-top: 15px;
 }
+.margin-top-2  {
+  margin-top: 30px;
+}
+.margin-bottom-2 {
+  margin-bottom: 30px;
+}
 
 /* Sidebar */
 .sidebar .list-group-item {

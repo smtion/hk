@@ -2,7 +2,8 @@
   <div class="title">견적서 관리</div>
 
   <div class="text-right margin-bottom-1">
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">등록</button>
+    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">등록</button> -->
+    <a class="btn btn-primary" href="/sales/quotation_create">등록</a>
   </div>
 
   <table class="table table-striped table-bordered">

@@ -63,6 +63,12 @@ class Sales extends EX_Controller {
     $this->load->view(LAYOUT, $this->cdata);
 	}
 
+  public function quotation_create()
+	{
+    $this->cdata->template = 'sales/quotation_create';
+    $this->load->view(LAYOUT, $this->cdata);
+	}
+
   public function approval()
 	{
     $this->cdata->template = 'sales/approval';

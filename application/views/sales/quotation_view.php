@@ -2,6 +2,49 @@
   <input id="id" type="hidden" value="<?=$id?>">
   <div class="title">견적서</div>
 
+  <div>프로젝트 선택</div>
+
+  <div class="form-horizontal">
+    <div class="form-group">
+      <label class="col-sm-2 form-control-static">적용 통화</label>
+      <div class="col-sm-10">
+        <label class="radio-inline">
+          <input type="radio" value="kwn" v-model="data.currency"> 대한민국(원)
+        </label>
+        <label class="radio-inline">
+          <input type="radio" value="cny" v-model="data.currency"> 중국 CNY
+        </label>
+        <label class="radio-inline">
+          <input type="radio" value="jpy" v-model="data.currency"> 일본 JPY
+        </label>
+        <label class="radio-inline">
+          <input type="radio" value="usd" v-model="data.currency"> 미국 USD
+        </label>
+        <label class="radio-inline">
+          <input type="radio" value="eur" v-model="data.currency"> 유로 EUR
+        </label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 form-control-static">해광 통화</label>
+      <div class="col-sm-4">
+        <input type="number" class="form-control">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 form-control-static">견적 적용 환율</label>
+      <div class="col-sm-4">
+        <input type="number" class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="form-group">
+      <label></label>
+      <input type="text" class="form-control" v-model="data.desc">
+    </div>
+  </div>
   <div class="form-horizontal">
     <div class="form-group">
       <label class="col-sm-2 form-control-static">Product</label>
