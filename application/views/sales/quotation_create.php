@@ -148,7 +148,7 @@
             <div class="clearfix">
               <div class="pull-left inner-td" v-for="(v, k) in item.details" v-bind:style="{width: 100 / Object.keys(item.details).length + '%'}">
                 <div>{{ k }}</div>
-                <div>{{ v ? v : &nbsp; }}</div>
+                <div>{{ v ? v : '&nbsp;' }}</div>
               </div>
             </div>
           </td>
@@ -208,7 +208,7 @@
             <div class="clearfix">
               <div class="pull-left inner-td" v-for="(v, k) in item.details" v-bind:style="{width: 100 / Object.keys(item.details).length + '%'}">
                 <div>{{ k }}</div>
-                <div>{{ v ? v : &nbsp; }}</div>
+                <div>{{ v ? v : '&nbsp;' }}</div>
               </div>
             </div>
           </td>

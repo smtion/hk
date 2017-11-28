@@ -88,7 +88,8 @@
   padding: 0;
 }
 .table .inner-td div {
-  padding: 8px;
+  /*padding: 8px;*/
+  padding: 12px;
 }
 .table .inner-td > div + div {
   border-top: 1px solid #ddd;
