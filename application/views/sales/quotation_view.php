@@ -1,4 +1,4 @@
-<div id="sales-quotation">
+<div id="sales-quotation" v-cloak>
   <input id="id" type="hidden" value="<?=$id?>">
   <div class="title">견적서</div>
 

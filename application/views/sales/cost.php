@@ -1,4 +1,4 @@
-<div id="sales-cost">
+<div id="sales-cost" v-cloak>
   <div class="title">간접비</div>
 
   <div class="text-right margin-bottom-1">

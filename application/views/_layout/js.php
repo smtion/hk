@@ -32,16 +32,15 @@ Vue.filter('nbsp', function (value) {
 
 $(document).ready(function () {
   // Set the sidebar .active class automatically
-  var path = location.pathname.match(/(\/([^\/.]*)(\/([^\/.]*)))/)[0];
-  $('.sidebar .list-group-item[href^="' + path + '"]').addClass('active');
+  // var path = location.pathname.match(/(\/([^\/.]*)(\/([^\/.]*)))/)[0];
+  // $('.sidebar .list-group-item[href^="' + path + '"]').addClass('active');
 
-  // $(".sidebar .list-group-item").each(function (i, obj) {
-  //   if ($(obj).attr('href') == location.pathname) {
-  //     $(obj).addClass('active');
-  //     return false;
-  //   }
-  // });
-  // })();
+  $(".sidebar .list-group-item").each(function (i, obj) {
+    if (location.pathname.indexOf($(obj).attr('href')) == 0) {
+      $(obj).addClass('active');
+      return false;
+    }
+  });
 });
 
 

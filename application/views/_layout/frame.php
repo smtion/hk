@@ -6,7 +6,7 @@
 <?php $this->load->view('_layout/css'); ?>
 <?php $this->load->view('_layout/js'); ?>
 </head>
-<body>
+<body >
 <?php if(is_logged_on()) $this->load->view('_layout/nav'); ?>
 <?php if(is_logged_on()) : ?>
   <div class="content-wrapper">

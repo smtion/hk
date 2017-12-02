@@ -1,11 +1,20 @@
-<div id="sales-quotation-create">
+<div id="sales-quotation-create" v-cloak>
   <div class="title">견적서 등록</div>
-
-  <div>프로젝트 선택</div>
+  <input id="id" type="hidden" value="<?=$id?>">
 
   <div class="form-horizontal">
     <div class="form-group">
-      <label class="col-sm-2 form-control-static">적용 통화</label>
+      <label class="col-sm-2 control-label">프로젝트</label>
+      <div class="col-sm-4">
+        <span class="form-control">{{ item.name }}</span>
+        <!-- <select class="form-control" v-model="indexProject" @change="selectProject()">
+          <option value="">선택하세요.</option>
+          <option v-for="(item, index) in projects" :value="index">{{ item.name }}</option>
+        </select> -->
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">적용 통화</label>
       <div class="col-sm-10">
         <label class="radio-inline">
           <input type="radio" value="kwn" v-model="data.currency"> 대한민국(원)
@@ -25,13 +34,13 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="col-sm-2 form-control-static">해광 통화</label>
+      <label class="col-sm-2 control-label">해광 통화</label>
       <div class="col-sm-4">
         <input type="number" class="form-control">
       </div>
     </div>
     <div class="form-group">
-      <label class="col-sm-2 form-control-static">견적 적용 환율</label>
+      <label class="col-sm-2 control-label">견적 적용 환율</label>
       <div class="col-sm-4">
         <input type="number" class="form-control">
       </div>
@@ -40,7 +49,7 @@
 
   <div class="form-horizontal">
     <div class="form-group">
-      <label class="col-sm-2 form-control-static">설명 </label>
+      <label class="col-sm-2 control-label">설명 </label>
       <div class="col-sm-10">
         <input type="text" class="form-control" v-model="data.desc">
       </div>
@@ -54,7 +63,7 @@
     <h4>제품</h4>
     <div class="form-horizontal">
       <div class="form-group">
-        <label class="col-sm-2 form-control-static">Product</label>
+        <label class="col-sm-2 control-label">Product</label>
         <div class="col-sm-4">
           <select class="form-control" v-model="indexProduct[index]">
             <option value="">선택하세요.</option>
@@ -94,11 +103,11 @@
           <td><input type="text" class="form-control" v-model="data.set[index]['products']['list'][j]['area']"></td>
           <td>
             <input type="text" class="form-control" style="margin-bottom: 5px;"
-              @keyup="calulate(data.set[index]['products']['list'][j])"
+              @keyup="calulate('products', index, j)"
               v-model="data.set[index]['products']['list'][j]['qty']">
             <div class="input-group">
               <input type="text" class="form-control"
-                @keyup="calulate(data.set[index]['products']['list'][j])"
+                @keyup="calulate('products', index, j)"
                 v-model="data.set[index]['products']['list'][j]['dc_rate']">
               <span class="input-group-addon">%</span>
             </div>
@@ -108,8 +117,26 @@
             <input type="text" class="form-control" v-model="data.set[index]['products']['list'][j]['sales_price_dc']" readonly>
           </td>
           <td>
-            <input type="text" class="form-control" v-model="data.set[index]['products']['list'][j]['total']" style="margin-bottom: 5px;">
-            <input type="text" class="form-control" v-model="data.set[index]['products']['list'][j]['total_dc']">
+            <input type="text" class="form-control" v-model="data.set[index]['products']['list'][j]['total']" style="margin-bottom: 5px;" readonly>
+            <input type="text" class="form-control" v-model="data.set[index]['products']['list'][j]['total_dc']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="10">합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['products']['total']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="10">절사</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['products']['rest']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="10">최종 합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['products']['total_final']" readonly>
           </td>
         </tr>
       </tbody>
@@ -119,7 +146,7 @@
     <h4>옵션</h4>
     <div class="form-horizontal">
       <div class="form-group">
-        <label class="col-sm-2 form-control-static">Option</label>
+        <label class="col-sm-2 control-label">Option</label>
         <div class="col-sm-4">
           <select class="form-control" v-model="indexOption[index]">
             <option value="">선택하세요.</option>
@@ -154,11 +181,11 @@
           </td>
           <td>
             <input type="text" class="form-control" style="margin-bottom: 5px;"
-              @keyup="calulate(data.set[index]['options']['list'][j])"
+              @keyup="calulate('options', index, j)"
               v-model="data.set[index]['options']['list'][j]['qty']">
             <div class="input-group">
               <input type="text" class="form-control"
-                @keyup="calulate(data.set[index]['options']['list'][j])"
+                @keyup="calulate('options', index, j)"
                 v-model="data.set[index]['options']['list'][j]['dc_rate']">
               <span class="input-group-addon">%</span>
             </div>
@@ -168,8 +195,26 @@
             <input type="text" class="form-control" v-model="data.set[index]['options']['list'][j]['sales_price_dc']" readonly>
           </td>
           <td>
-            <input type="text" class="form-control" v-model="data.set[index]['options']['list'][j]['total']" style="margin-bottom: 5px;">
-            <input type="text" class="form-control" v-model="data.set[index]['options']['list'][j]['total_dc']">
+            <input type="text" class="form-control" v-model="data.set[index]['options']['list'][j]['total']" style="margin-bottom: 5px;" readonly>
+            <input type="text" class="form-control" v-model="data.set[index]['options']['list'][j]['total_dc']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['options']['total']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">절사</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['options']['rest']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">최종 합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['options']['total_final']" readonly>
           </td>
         </tr>
       </tbody>
@@ -179,7 +224,7 @@
     <h4>부자재</h4>
     <div class="form-horizontal">
       <div class="form-group">
-        <label class="col-sm-2 form-control-static">Sub-material</label>
+        <label class="col-sm-2 control-label">Sub-material</label>
         <div class="col-sm-4">
           <select class="form-control" v-model="indexMaterial[index]">
             <option value="">선택하세요.</option>
@@ -214,11 +259,11 @@
           </td>
           <td>
             <input type="text" class="form-control" style="margin-bottom: 5px;"
-              @keyup="calulate(data.set[index]['materials']['list'][j])"
+              @keyup="calulate('materials', index, j)"
               v-model="data.set[index]['materials']['list'][j]['qty']">
             <div class="input-group">
               <input type="text" class="form-control"
-                @keyup="calulate(data.set[index]['materials']['list'][j])"
+                @keyup="calulate('materials', index, j)"
                 v-model="data.set[index]['materials']['list'][j]['dc_rate']">
               <span class="input-group-addon">%</span>
             </div>
@@ -228,20 +273,34 @@
             <input type="text" class="form-control" v-model="data.set[index]['materials']['list'][j]['sales_price_dc']" readonly>
           </td>
           <td>
-            <input type="text" class="form-control" v-model="data.set[index]['materials']['list'][j]['total']" style="margin-bottom: 5px;">
-            <input type="text" class="form-control" v-model="data.set[index]['materials']['list'][j]['total_dc']">
+            <input type="text" class="form-control" v-model="data.set[index]['materials']['list'][j]['total']" style="margin-bottom: 5px;" readonly>
+            <input type="text" class="form-control" v-model="data.set[index]['materials']['list'][j]['total_dc']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['materials']['total']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">절사</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['materials']['rest']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">최종 합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['materials']['total_final']" readonly>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div clss="margin-top-1">
-    <button class="btn btn-primary" @click="addSet()">추가</button>
-  </div>
-
-  <div clss="margin-top-1">
-    <button class="btn btn-primary" @click="save()">저장</button>
+  <div class="text-center margin-top-1">
+    <button class="btn btn-primary" @click="addSet()">추가</button> <button class="btn btn-primary" @click="save()">저장</button>
   </div>
 </div>
 
@@ -249,10 +308,8 @@
 var vm = new Vue({
   el: '#sales-quotation-create',
   data: {
-    a: 1,
-    b: 2,
-    c: '',
     id: $('#id').val(),
+    item: {},
     data: {
       set: [],
     },
@@ -261,21 +318,21 @@ var vm = new Vue({
         products: [],
         options: [],
         materials: [],
-        costs: [],
+        // costs: [],
       }
     ],
+    projects: [],
     products: [],
     options: [],
     materials: [],
     costs: [],
-
     setCount: 0,
-
-
+    indexProject: '',
     indexProduct: [''],
     indexOption: [''],
     indexMaterial: [''],
     indexCost: [''],
+    selectedProject: {},
     selectedProduct: undefined,
     selectedOption: undefined,
     selectedMaterial: undefined,
@@ -284,18 +341,18 @@ var vm = new Vue({
     selectedMaterials: [],
     selectedCosts: [],
   },
+  mounted: function () {
+    this.$nextTick(function () {
+      vm.init();
+    });
+  },
   methods: {
     init: function () {
-      vm.data.id = vm.id;
-      vm.reload();
+      vm.data.quotation_id = vm.id;
+      vm.getQuotation();
       vm.addSet();
     },
     reload: function () {
-      vm.getItem();
-      vm.getProducts();
-      vm.getOptions();
-      vm.getMaterials();
-      vm.getCosts();
     },
     addSet: function () {
       vm.setCount++;
@@ -303,8 +360,20 @@ var vm = new Vue({
       vm.indexOption.push('');
       vm.indexMaterial.push('');
       vm.indexCost.push('');
-      vm.selected.push({products: [], options: [], materials: [], costs: []});
-      vm.data.set.push({products: {total: 0, list: []}, options: {total: 0, list: []}, materials: {total: 0, list: []}, costs: {total: 0, list: []}});
+      vm.selected.push({products: [], options: [], materials: []});
+      vm.data.set.push({
+        products: {total: 0, rest: 0, total_final: 0, list: []},
+        options: {total: 0, rest: 0, total_final: 0,list: []},
+        materials: {total: 0, rest: 0, total_final: 0,list: []},
+        // costs: {total: 0, rest: 0, total_final: 0,list: []}
+      });
+    },
+    selectProject: function () {
+      vm.selectedProject = vm.projects[vm.indexProject];
+      vm.data.project_id = vm.selectedProject.id;
+      vm.data.customer_id = vm.selectedProject.customer_id;
+
+      vm.reload();
     },
     selectProduct: function (index) {
       vm.selected[index]['products'].push(vm.products[vm.indexProduct[index]]);
@@ -354,62 +423,87 @@ var vm = new Vue({
         dc_rate: '',
       });
     },
-    calulate: function (item) {
+    calulate: function (type, i, j) {
+      var item = vm.data.set[i][type]['list'][j];
       item.total = item.qty * item.sales_price;
       item.sales_price_dc = item.sales_price * (100 - item.dc_rate) / 100;
       item.total_dc = item.qty * item.sales_price_dc;
+
+      vm.data.set[i][type]['total'] = 0;
+      vm.data.set[i][type]['list'].forEach(function (obj) {
+        vm.data.set[i][type]['total'] += obj.total_dc;
+      });
+      vm.data.set[i][type]['rest'] = vm.data.set[i][type]['total'] % 10000;
+      vm.data.set[i][type]['total_final'] = vm.data.set[i][type]['total'] - vm.data.set[i][type]['rest'];
     },
-    getItem: function () {
+    getQuotation: function () {
       axios.get('/api/sales/quotation/' + vm.id).then(function (response) {
         if (response.status == 200) {
           vm.item = response.data.item;
-          vm.selectedProduct = response.data.selected.product;
-          vm.selectedOption = response.data.selected.option;
-          vm.selectedMaterial = response.data.selected.material;
-          vm.selectedCost = response.data.selected.cost;
-          vm.data.product = response.data.data.product ? response.data.data.product : {};
-          vm.data.option = response.data.data.option ? response.data.data.option : {};
-          vm.data.material = response.data.data.material ? response.data.data.material : {};
-          vm.data.cost = response.data.data.cost ? response.data.data.cost : {};
+          // vm.selectedProduct = response.data.selected.product;
+          // vm.selectedOption = response.data.selected.option;
+          // vm.selectedMaterial = response.data.selected.material;
+          // vm.selectedCost = response.data.selected.cost;
+          // vm.data.product = response.data.data.product ? response.data.data.product : {};
+          // vm.data.option = response.data.data.option ? response.data.data.option : {};
+          // vm.data.material = response.data.data.material ? response.data.data.material : {};
+          // vm.data.cost = response.data.data.cost ? response.data.data.cost : {};
+
+          vm.getProducts();
+          vm.getOptions();
+          vm.getMaterials();
+          vm.getCosts();
+        }
+      });
+    },
+    getProjects: function () {
+      axios.get('/api/sales/quotation_projects').then(function (response) {
+        if (response.status == 200) {
+          vm.projects = response.data.list;
         }
       });
     },
     getProducts: function () {
-      axios.get('/api/sales/quotation_products').then(function (response) {
+      axios.get('/api/sales/quotation_products/' + vm.item.customer_id).then(function (response) {
         if (response.status == 200) {
           vm.products = response.data.list;
         }
       });
     },
     getOptions: function () {
-      axios.get('/api/sales/quotation_options').then(function (response) {
+      axios.get('/api/sales/quotation_options/' + vm.item.customer_id).then(function (response) {
         if (response.status == 200) {
           vm.options = response.data.list;
         }
       });
     },
     getMaterials: function () {
-      axios.get('/api/sales/quotation_materials').then(function (response) {
+      axios.get('/api/sales/quotation_materials/' + vm.item.customer_id).then(function (response) {
         if (response.status == 200) {
           vm.materials = response.data.list;
         }
       });
     },
     getCosts: function () {
-      axios.get('/api/sales/quotation_costs').then(function (response) {
+      axios.get('/api/sales/quotation_costs/' + vm.item.customer_id).then(function (response) {
         if (response.status == 200) {
           vm.costs = response.data.list;
         }
       });
     },
     save: function () {
-      axios.put('/api/sales/quotation_detail', vm.data).then(function (response) {
-        if (response.status == 200) {
+      vm.data.total = 0;
+      vm.data.set.forEach(function (set) {
+        vm.data.total += (set.products.total_final + set.options.total_final + set.materials.total_final);
+      });
+      // console.log(vm.data.total);
+
+      axios.post('/api/sales/quotation_detail', vm.data).then(function (response) {
+        if (response.status == 201) {
           alert('저장되었습니다.');
         }
       });
     },
   }
 });
-vm.init();
 </script>

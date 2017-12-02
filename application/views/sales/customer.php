@@ -1,4 +1,4 @@
-<div id="sales-customer">
+<div id="sales-customer" v-cloak>
   <div class="title">고객 관리</div>
 
   <div class="text-right margin-bottom-1">

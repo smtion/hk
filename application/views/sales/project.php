@@ -1,8 +1,8 @@
-<div id="sales-project">
+<div id="sales-project" v-cloak>
   <div class="title">프로젝트 관리</div>
 
   <div class="text-right margin-bottom-1">
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">등록</button>
+    <a class="btn btn-primary" href="/sales/project_create">등록</a>
   </div>
 
   <table class="table table-striped table-bordered">
@@ -19,7 +19,7 @@
         <td>{{ getNo(index) }}</td>
         <td>{{ item.corp_name }}</td>
         <td>{{ item.name }}</td>
-        <td><span class="pointer" @click="edit(index)">편집</span></td>
+        <td><a  :href="'/sales/project/' + item.id">보기</a></td>
       </tr>
     </tbody>
   </table>

@@ -1,9 +1,9 @@
-<div id="sales-quotation">
+<div id="sales-quotation" v-cloak>
   <div class="title">견적서 관리</div>
 
   <div class="text-right margin-bottom-1">
-    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">등록</button> -->
-    <a class="btn btn-primary" href="/sales/quotation_create">등록</a>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">등록</button>
+    <!-- <a class="btn btn-primary" href="/sales/quotation_create">등록</a> -->
   </div>
 
   <table class="table table-striped table-bordered">
@@ -11,18 +11,13 @@
       <tr>
         <th>No</th>
         <th>견적번호</th>
-        <th>견적서 버전</th>
+        <th>Version</th>
+        <th>국가</th>
+        <th>회사이름</th>
         <th>프로젝트 이름</th>
-        <th>납기 기간</th>
+        <th>계약서 발행일</th>
         <th>총금액</th>
-        <th>승인 요청 날짜</th>
-        <th>승인 날짜</th>
-        <th>고객 전송 날짜</th>
-        <th>승인</th>
-        <th>보기</th>
-        <th>이메일 전송</th>
-        <th>전송자</th>
-        <th></th>
+        <th>견적상세등록</th>
       </tr>
     </thead>
     <tbody>
@@ -30,16 +25,12 @@
         <td>{{ getNo(index) }}</td>
         <td>{{ item.code }}</td>
         <td>{{ item.version }}</td>
+        <td>{{ item.country }}</td>
+        <td>{{ item.corp_name }}</td>
         <td>{{ item.name }}</td>
-        <td>{{ item.delivery_term }}일 후</td>
-        <td>{{ }}</td>
-        <td>{{ }}</td>
-        <td>{{ }}</td>
-        <td>{{ }}</td>
-        <td>{{ item.status }}</td>
-        <td><a class="btn btn-default btn-sm" :href="'sales/quotation/' + item.id">보기</a></td>
-        <td>{{ }}</td>
-        <td><span class="pointer" @click="edit(index)">편집</span></td>
+        <td>{{ item.publish_date }}</td>
+        <td>{{ item.total | number }}</td>
+        <td><a class="btn btn-default btn-sm" :href="'sales/quotation_create/' + item.id">추가</a></td>
       </tr>
     </tbody>
   </table>
@@ -220,7 +211,7 @@ var vm = new Vue({
       d: 0,
       ns: false,
     },
-    search: 'corp_name',
+    search: 'code',
     keyword: '',
     paginate: {},
   },
@@ -238,6 +229,7 @@ var vm = new Vue({
     reset: function () {
       vm.data = {
         expiry_day: 30,
+        project_id: '',
       };
       vm.selectedIndex = '';
       vm.pt = {

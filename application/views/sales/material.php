@@ -1,4 +1,4 @@
-<div id="sales-material">
+<div id="sales-material" v-cloak>
   <div class="title">부자재</div>
 
   <div class="text-right margin-bottom-1">

@@ -1,4 +1,4 @@
-<div id="sales-currency">
+<div id="sales-currency" v-cloak>
   <div class="title">환율 관리</div>
 
   <div class="clearfix">

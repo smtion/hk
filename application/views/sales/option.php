@@ -1,4 +1,4 @@
-<div id="sales-option">
+<div id="sales-option" v-cloak>
   <div class="title">옵션</div>
 
   <div class="text-right margin-bottom-1">

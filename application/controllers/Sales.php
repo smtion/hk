@@ -50,9 +50,16 @@ class Sales extends EX_Controller {
     $this->load->view(LAYOUT, $this->cdata);
 	}
 
-  public function project()
+  public function project($id = 0)
 	{
-    $this->cdata->template = 'sales/project';
+    $this->cdata->id = $id;
+    $this->cdata->template = $id ? 'sales/project_view' : 'sales/project';
+    $this->load->view(LAYOUT, $this->cdata);
+	}
+
+  public function project_create()
+	{
+    $this->cdata->template = 'sales/project_create';
     $this->load->view(LAYOUT, $this->cdata);
 	}
 
@@ -63,8 +70,13 @@ class Sales extends EX_Controller {
     $this->load->view(LAYOUT, $this->cdata);
 	}
 
-  public function quotation_create()
+  public function quotation_create($id = 0)
 	{
+    if (!$id) {
+      redirect('/sales/quotation');
+    }
+
+    $this->cdata->id = $id;
     $this->cdata->template = 'sales/quotation_create';
     $this->load->view(LAYOUT, $this->cdata);
 	}

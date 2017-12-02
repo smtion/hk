@@ -5,6 +5,9 @@
 * {
   word-break: keep-all;
 }
+[v-cloak] {
+  display:none;
+}
 
 .navbar {
   margin-bottom: 0;

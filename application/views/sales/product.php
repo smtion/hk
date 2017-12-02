@@ -1,4 +1,4 @@
-<div id="sales-product">
+<div id="sales-product" v-cloak>
   <div class="title">제품</div>
 
   <div class="text-right margin-bottom-1">
