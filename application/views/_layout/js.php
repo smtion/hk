@@ -29,6 +29,9 @@ Vue.filter('nbsp', function (value) {
   if (!value) return '<span></span>';
   else return value;
 });
+Vue.filter('date', function (value) {
+  return value.substr(0, 10);
+});
 
 $(document).ready(function () {
   // Set the sidebar .active class automatically

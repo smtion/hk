@@ -42,14 +42,24 @@ function get_auth_code()
   return get_session_data('auth_code');
 }
 
-function get_partner_id()
+function get_admin()
 {
-  return get_session_data('partner_id');
+  return get_session_data('admin');
 }
 
 function is_logged_on()
 {
   return strlen(get_user_id()) > 0;
+}
+
+function is_admin()
+{
+  return get_admin() == 1;
+}
+
+function has_permission($key) {
+  $p = get_session_data('permission');
+  return is_admin() ? true : (isset($p[$key]) ? $p[$key] : false);
 }
 
 function get_session_data($key)

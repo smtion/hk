@@ -8,26 +8,30 @@ class Auth extends REST_Controller {
   public function login_post()
   {
     $email = $this->post('email');
-    $this->post('password');
+    $password = hash('sha256', $this->post('password'));
 
-    // @TODO get user info
+    $user = $this->db->where('email', $email)->where('password', $password)
+            // ->where('password', "HEX(AES_ENCRYPT('{$password}', '{$password}'))", FALSE)
+            ->get('HK_users')->row_array();
 
-    $this->session->set_userdata('user_id', $email);
-    $this->session->set_userdata('name', '관리자');
-    $this->session->set_userdata('email', $email);
-    $this->session->set_userdata('role', 'admin');
-    $this->session->set_userdata('level', '100');
-    $this->session->set_userdata('permission', ['a'=>1, 'b'=>2, 'c'=>3]);
+    if ($user) {
+      $this->session->set_userdata('user_id', $user['id']);
+      $this->session->set_userdata('name', $user['name']);
+      $this->session->set_userdata('email', $user['email']);
+      $this->session->set_userdata('admin', $user['admin']);
+      $this->session->set_userdata('permission', json_decode($user['permission'], true));
 
-    $response = [
-      // 'email' => $this->post('email'),
-      // 'password' => $this->post('password'),
-      // 'message' => 'Added a resource'
-    ];
+      //
+      $data = [
+        'user_id' => $user['id'],
+        'ip' => get_client_ip(),
+        'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+      ];
+      $this->db->insert('HK_login_history', $data);
 
-    $http_status = REST_Controller::HTTP_OK;
-    // $http_status = REST_Controller::HTTP_UNAUTHORIZED;
-
-    $this->set_response($response, $http_status); // CREATED (201) being the HTTP response code
+      $this->response(null, REST_Controller::HTTP_OK);
+    } else {
+      $this->response(null, REST_Controller::HTTP_UNAUTHORIZED);
+    }
   }
 }

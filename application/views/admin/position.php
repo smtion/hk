@@ -1,5 +1,5 @@
- <div id="purchase-material-list">
-  <div class="title">부자재 목록</div>
+<div id="admin-position" v-cloak>
+  <div class="title">직급 관리</div>
 
   <div class="text-right margin-bottom-1">
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">등록</button>
@@ -9,8 +9,8 @@
     <thead>
       <tr>
         <th>No</th>
-        <th>부자재명</th>
-        <th>부자재 상세</th>
+        <th>이름</th>
+        <th>등록일</th>
         <th></th>
       </tr>
     </thead>
@@ -18,14 +18,7 @@
       <tr v-for="(item, index) in list">
         <td>{{ getNo(index) }}</td>
         <td>{{ item.name }}</td>
-        <td class="outer-td">
-          <div class="clearfix">
-            <div class="pull-left inner-td" v-for="(v, k) in item.details" v-bind:style="{width: 100 / Object.keys(item.details).length + '%'}">
-              <div>{{ k }}</div>
-              <div>{{ v }}</div>
-            </div>
-          </div>
-        </td>
+        <td>{{ item.created_at | date }}</td>
         <td><span class="pointer" @click="edit(index)">편집</span></td>
       </tr>
     </tbody>
@@ -42,11 +35,10 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
-        <option value="name">부자재명</option>
-        <option value="details">부자재상세</option>
+        <option value="name">이름</option>
       </select>
     </div>
     <div class="col-sm-4">
@@ -55,7 +47,7 @@
     <div class="col-sm-2">
       <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">
@@ -63,27 +55,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="myModalLabel">부자재 등록</h4>
+          <h4 class="modal-title" id="myModalLabel">직급 <span v-show="!data.id">등록</span><span v-show="data.id">정보 변경</span></h4>
         </div>
         <div class="modal-body">
           <div class="form-horizontal">
             <div class="form-group">
-              <label class="col-sm-4 control-label">부자재명</label>
+              <label class="col-sm-4 control-label">이름</label>
               <div class="col-sm-8">
-                <select class="form-control" v-model="option_index" @change="getOptionDetail2()" v-show="!data.id">
-                  <option value="">선택하세요.</option>
-                  <option v-for="(item, index) in options" :value="index">{{ item.name }}</option>
-                </select>
-                <span class="form-control" v-show="data.id">{{ data.name }}</span>
-              </div>
-            </div>
-            <div class="form-group" v-for="item in option_detail2">
-              <label class="col-sm-4 control-label">{{ item.type }}</label>
-              <div class="col-sm-8">
-                <select class="form-control" v-model="data.details[item.type]">
-                  <option value="">선택하세요.</option>
-                  <option v-for="(value, index) in item.values" :value="value">{{ value }}</option>
-                </select>
+                <input id="name" type="text" class="form-control" v-model="data.name">
               </div>
             </div>
           </div>
@@ -100,34 +79,32 @@
 
 <script>
 var vm = new Vue({
-  el: '#purchase-material-list',
+  el: '#admin-position',
   data: {
     list: [],
     data: {},
-    options: [],
-    option_detail2: [],
-    option_index: '',
     search: 'name',
     keyword: '',
     paginate: {},
   },
+  mounted: function () {
+    this.$nextTick(function () {
+      vm.init();
+    });
+  },
   methods: {
-    get: function () {
-      return '50px';
-    },
     init: function () {
       if (!vm.paginate.page) vm.paginate.page = 1;
       $('#modalCreate').on('hidden.bs.modal', function () {
         vm.reset();
-      })
-      vm.getOptionName();
+      });
+      $('#modalCreate').on('shown.bs.modal', function () {
+        $('#name').focus();
+      });
       vm.reload();
     },
     reset: function () {
-      vm.data = {
-        details: {},
-      };
-      vm.option_index = '';
+      vm.data = {};
     },
     reload: function () {
       vm.reset();
@@ -140,44 +117,8 @@ var vm = new Vue({
       vm.getList(page);
     },
     edit: function (index) {
-      var tmp =  JSON.parse(JSON.stringify(vm.list[index]));
-      vm.data = tmp;
-      // vm.data.details = JSON.parse(tmp.details);
-
-      var params = makeParams({
-        'name': vm.data.name
-      });
-      axios.get('/api/purchase/material_detail2?' + params).then(function (response) {
-        if (response.status == 200) {
-          vm.option_detail2 = response.data.list;
-        }
-      });
-
+      vm.data =  JSON.parse(JSON.stringify(vm.list[index]));
       $('#modalCreate').modal('show');
-    },
-    getOptionName: function () {
-      axios.get('/api/purchase/material_parts_name').then(function (response) {
-        if (response.status == 200) {
-          vm.options = response.data.list;
-        }
-      });
-    },
-    getOptionDetail2: function () {
-      var params = makeParams({
-        'name': vm.options[vm.option_index]['name']
-      });
-      axios.get('/api/purchase/material_detail2?' + params).then(function (response) {
-        if (response.status == 200) {
-          vm.option_detail2 = response.data.list;
-
-          vm.data.name = vm.options[vm.option_index]['name'];
-          vm.data.details = {};
-          vm.option_detail2.map(function (item, index) {
-            // vm.data.details[index] = {};
-            vm.data.details[item.type] = '';
-          });
-        }
-      });
     },
     getList: function (page) {
       if (!page) page = 1;
@@ -187,7 +128,7 @@ var vm = new Vue({
         search: vm.search,
         keyword: vm.keyword,
       });
-      axios.get('/api/purchase/material_list?' + params).then(function (response) {
+      axios.get('/api/admin/position?' + params).then(function (response) {
         if (response.status == 200) {
           vm.list = response.data.list;
           vm.paginate = response.data.paginate;
@@ -195,7 +136,7 @@ var vm = new Vue({
       });
     },
     create: function () {
-      axios.post('/api/purchase/material_list', vm.data).then(function (response) {
+      axios.post('/api/admin/position', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');
           $('#modalCreate').modal('hide');
@@ -204,7 +145,7 @@ var vm = new Vue({
       });
     },
     update: function () {
-      axios.patch('/api/purchase/material_list', vm.data).then(function (response) {
+      axios.patch('/api/admin/position', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');
           $('#modalCreate').modal('hide');
@@ -214,5 +155,4 @@ var vm = new Vue({
     }
   }
 });
-vm.init();
 </script>

@@ -11,11 +11,11 @@
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href="/sales">영업팀</a></li>
-        <li><a href="/purchase">구매팀</a></li>
-        <li><a href="/production">생산팀</a></li>
-        <li><a href="/finance">재무팀</a></li>
-        <li><a href="/admin">관리자</a></li>
+        <? if (has_permission('sales')) : ?><li><a href="/sales">영업팀</a></li><? endif ?>
+        <? if (has_permission('purchase')) : ?><li><a href="/purchase">구매팀</a></li><? endif ?>
+        <? if (has_permission('production')) : ?><li><a href="/production">생산팀</a></li><? endif ?>
+        <? if (has_permission('finance')) : ?><li><a href="/finance">재무팀</a></li><? endif ?>
+        <? if (has_permission('admin')) : ?><li><a href="/admin">관리자</a></li><? endif ?>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li class="dropdown">

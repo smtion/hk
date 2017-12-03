@@ -305,7 +305,7 @@ class Purchase extends REST_Controller {
 
     $list = array_map(function ($item) {
       $item['details'] = json_decode($item['details']);
-      $item['prices'] = json_decode($item['prices']);
+      // $item['prices'] = json_decode($item['prices']);
       return $item;
     }, $list);
 
