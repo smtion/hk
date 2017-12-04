@@ -13,6 +13,7 @@
   ],
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.47"
+    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
+    "chart.js": "^2.7.1"
   }
 }

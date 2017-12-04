@@ -9,7 +9,7 @@
 <script src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/node_modules/vue-bootstrap-datetimepicker/dist/vue-bootstrap-datetimepicker.min.js"></script>
 
-
+<script src="/bower_components/chart.js/dist/Chart.min.js"></script>
 <script>
 Vue.component('paginate', VuejsPaginate);
 Vue.component('date-picker', VueBootstrapDatetimePicker.default);
@@ -32,6 +32,16 @@ Vue.filter('nbsp', function (value) {
 Vue.filter('date', function (value) {
   return value.substr(0, 10);
 });
+Vue.filter('jsdate', function (diff) {
+  var d = null;
+  if (diff) {
+    d = new Date(new Date().setDate(new Date().getDate() + diff));
+  } else {
+    d = new Date();
+  }
+
+  return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).substr(-2) + '-' + ('0' + d.getDate()).substr(-2);
+})
 
 $(document).ready(function () {
   // Set the sidebar .active class automatically

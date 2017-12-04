@@ -11,7 +11,8 @@ class Admin extends REST_Controller {
 
     if (!is_logged_on()) {
       $this->response(NULL, REST_Controller::HTTP_UNAUTHORIZED);
-    } elseif (!is_admin()) {
+    }
+    if (!has_permission('admin')) {
       $this->response(NULL, REST_Controller::HTTP_FORBIDDEN);
     }
   }

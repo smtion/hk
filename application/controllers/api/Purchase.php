@@ -15,6 +15,92 @@ class Purchase extends REST_Controller {
   }
 
   //-----------------------------------------------------------------------
+  // Aluminum
+  //-----------------------------------------------------------------------
+  public function aluminum_get()
+	{
+    $data = $this->get();
+
+    $list = $this->db->where('date >=', implode('-', [$data['year'], $data['month'], '01']))
+            ->where('date <=', implode('-', [$data['year'], $data['month'], '31']))
+            ->order_by('date ASC')->get('HK_aluminum')->result_array();
+
+    $labels = [];
+    $data1 = [];
+    $data2 = [];
+    foreach ($list as $item) {
+      $labels[] = substr($item['date'], 5, 5);
+      $data1[] = $item['price'];
+      $data2[] = $item['buy_price'];
+    }
+    // $list = array_map(function ($item) {
+    //   $tmp = [];
+    //   $tmp[$item['date']] = $item;
+    //   return $tmp;
+    // }, $list);
+
+    $response = [
+      'labels' => $labels,
+      'data1' => $data1,
+      'data2' => $data2,
+    ];
+
+    $this->response($response, REST_Controller::HTTP_OK);
+	}
+
+  public function aluminum2_get()
+	{
+    $prev1Date = date('Y-m-d', strtotime('-1 days', time()));
+    $prev2Date = date('Y-m-d', strtotime('-2 days', time()));
+    $prev = $this->db->where_in('date', [$prev1Date, $prev2Date])->get('HK_aluminum')->result_array();
+    $data = $this->db->where('date', today())->get('HK_aluminum')->row_array();
+
+    $list = [];
+    foreach ($prev as $item) {
+      $list[$item['date']] = $item;
+    }
+    // $list = array_map(function ($item) {
+    //   $tmp = [];
+    //   $tmp[$item['date']] = $item;
+    //   return $tmp;
+    // }, $list);
+
+    $response = [
+      'list' => $list,
+      'data' => $data,
+    ];
+
+    $this->response($response, REST_Controller::HTTP_OK);
+	}
+
+  public function aluminum_put()
+  {
+    $data = $this->put();
+
+    if ($this->db->where('date', $data['date'])->count_all_results('HK_aluminum')) {
+      $result = $this->db->where('date', $data['date'])->update('HK_aluminum', $data);
+    } else {
+      $this->db->insert('HK_aluminum', $data);
+      $result = $this->db->insert_id();
+    }
+
+    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
+    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+  }
+
+  // public function option_parts_patch()
+  // {
+  //   $data = $this->patch();
+  //   $data['values'] = json_encode(array_filter($data['values'], function ($v) { if (trim($v) ) return $v; }), JSON_UNESCAPED_UNICODE);
+  //   $result = $this->db->where('id', $data['id'])->update('HK_option_parts', $data);
+  //
+  //   if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
+  //   else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+  // }
+
+
+
+  //-----------------------------------------------------------------------
   // Option parts
   //-----------------------------------------------------------------------
   public function option_parts_get()
