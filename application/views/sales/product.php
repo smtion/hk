@@ -67,7 +67,7 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
         <option value="model">모델명</option>
@@ -77,9 +77,9 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">
@@ -94,7 +94,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">고객사</label>
               <div class="col-sm-8">
-                <select class="form-control" v-model="indexCustomer" @change="selectCustomer()">
+                <select id="customer" class="form-control" v-model="indexCustomer" @change="selectCustomer()">
                   <option value="">선택하세요.</option>
                   <option v-for="(item, index) in customers" :value="index">{{ item.corp_name }}</option>
                 </select>
@@ -103,7 +103,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">모델명</label>
               <div class="col-sm-8">
-                <select class="form-control" v-model="indexProduct" @change="selectProduct()">
+                <select id="option" class="form-control" v-model="indexProduct" @change="selectProduct()">
                   <option value="">선택하세요.</option>
                   <option v-for="(item, index) in creatableList" :value="index">{{ item.model }}</option>
                 </select>
@@ -273,14 +273,21 @@ var vm = new Vue({
         }
       });
     },
-    create: function () {
+    validate: function () {
       if (!vm.data.customer_id) {
         alert('고객사를 선택하세요.');
-        return;
+        $('#customer').focus();
+        return false;
       } else if (!vm.data.product_id) {
-        alert('부자재를 선택하세요.');
-        return;
+        alert('제품을 선택하세요.');
+        $('#option').focus();
+        return false;
       }
+
+      return true;
+    },
+    create: function () {
+      if (!vm.validate()) return;
 
       axios.post('/api/sales/product', vm.data).then(function (response) {
         if (response.status == 201) {

@@ -140,7 +140,7 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
         <option value="model">모델명</option>
@@ -150,9 +150,9 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">
@@ -167,13 +167,13 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">Model</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="data.model">
+                <input id="model" type="text" class="form-control" v-model="data.model">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-4 control-label">Size</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="data.size">
+                <input id="size" type="text" class="form-control" v-model="data.size">
               </div>
             </div>
             <div class="form-group">
@@ -349,7 +349,22 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.model) {
+        alert('모델명을 입력하세요.');
+        $('#model').focus();
+        return false;
+      } else if (!vm.data.size) {
+        alert('사이즈를 입력하세요.');
+        $('#size').focus();
+        return false;
+      }
+
+      return true;
+    },
     create: function () {
+      if (!vm.validate()) return;
+
       axios.post('/api/purchase/product_list', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');
@@ -359,6 +374,8 @@ var vm = new Vue({
       });
     },
     update: function () {
+      if (!vm.validate()) return;
+
       axios.patch('/api/purchase/product_list', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');

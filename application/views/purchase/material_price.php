@@ -66,7 +66,7 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
         <option value="name">부자재명</option>
@@ -77,9 +77,9 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">

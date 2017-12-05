@@ -33,6 +33,7 @@ class Mypage extends REST_Controller {
       'item' => $item
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -53,7 +54,7 @@ class Mypage extends REST_Controller {
     }
     $result = $this->db->where('id', $this->user_id)->update('HK_company_info', $data);
 
-
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -95,6 +96,7 @@ class Mypage extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 }

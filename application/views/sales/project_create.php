@@ -5,7 +5,7 @@
     <div class="form-group">
       <label class="col-sm-4 control-label">프로젝트 이름</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" v-model="data.name">
+        <input id="name" type="text" class="form-control" v-model="data.name">
       </div>
       <div class="col-sm-2">
         <button class="btn btn-primary" @click="check()">중복확인</button>
@@ -199,20 +199,44 @@ var vm = new Vue({
       vm.data = JSON.parse(JSON.stringify(vm.list[index]));
       $('#modalSearch').modal('show');
     },
+    validate: function () {
+      if (!vm.data.name) {
+        alert('이름을 입력하세요.');
+        $('#name').focus();
+        return false;
+      } else if (!vm.selectedCustomer.corp_name) {
+        alert('회사를 선택하세요.');
+        return false;
+      }
+
+      return true;
+    },
     create: function () {
+      if (!vm.validate()) return;
+
       axios.post('/api/sales/project', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');
           location.href = "/sales/project";
         }
+      }, function (error) {
+        if (error.response.status == 422) {
+          alert('이미 존재하는 이름입니다.');
+        }
       });
     },
     update: function () {
+      if (!vm.validate()) return;
+
       axios.patch('/api/sales/project', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');
           $('#modalSearch').modal('hide');
           vm.reload();
+        }
+      }, function (error) {
+        if (error.response.status == 422) {
+          alert('이미 존재하는 이름입니다.');
         }
       });
     }

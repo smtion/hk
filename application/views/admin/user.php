@@ -60,7 +60,7 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
   </form>
 
@@ -281,28 +281,34 @@ var vm = new Vue({
         }
       });
     },
-    create: function () {
+    validate: function () {
       if (!vm.data.name) {
         alert('이름을 입력하세요');
         $('#name').focus();
-        return;
+        return false;
       } else if (!vm.data.password) {
         alert('임시 비밀번호를 입력하세요');
         $('#password').focus();
-        return;
+        return false;
       } else if (!vm.deptId) {
         alert('부서를 선택하세요');
         $('#dept_id').focus();
-        return;
+        return false;
       } else if (!vm.positionId) {
         alert('직급을 선택하세요');
         $('#position_id').focus();
-        return;
+        return false;
       } else if (!vm.data.email) {
         alert('이메일을 입력하세요');
         $('#email').focus();
-        return;
+        return false;
       }
+
+      return true;
+    },
+    create: function () {
+      if (!vm.validate()) return;
+
       vm.data.dept_id = vm.deptId;
       vm.data.position_id = vm.positionId;
 
@@ -315,29 +321,14 @@ var vm = new Vue({
       });
     },
     update: function () {
-      if (!vm.data.name) {
-        alert('이름을 입력하세요');
-        $('#name').focus();
-        return;
-      } else if (!vm.deptId) {
-        alert('부서를 선택하세요');
-        $('#dept_id').focus();
-        return;
-      } else if (!vm.positionId) {
-        alert('직급을 선택하세요');
-        $('#position_id').focus();
-        return;
-      } else if (!vm.data.email) {
-        alert('이메일을 입력하세요');
-        $('#email').focus();
-        return;
-      }
+      if (!vm.validate()) return;
+
       vm.data.dept_id = vm.deptId;
       vm.data.position_id = vm.positionId;
 
       if (vm.data.password) {
         if (!confirm('임시 비밀번호를 발급합니다.')) {
-          return;
+          return false;
         }
       }
 

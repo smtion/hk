@@ -1,5 +1,5 @@
-<div id="admin-login-history">
-  <div class="title">사용자 접속 정보</div>
+<div id="admin-activity">
+  <div class="title">사용자 활동 정보</div>
 
   <table class="table table-striped table-bordered">
     <thead>
@@ -8,8 +8,9 @@
         <th>이름</th>
         <th>부서명</th>
         <th>직급</th>
-        <th>IP</th>
-        <th>로그인 일시</th>
+        <th>메뉴</th>
+        <th>활동</th>
+        <th>활동 일시</th>
       </tr>
     </thead>
     <tbody>
@@ -18,7 +19,8 @@
         <td>{{ item.name }}</td>
         <td>{{ item.dept_name }}</td>
         <td>{{ item.position_name }}</td>
-        <td>{{ item.ip }}</td>
+        <td>{{ item.class }}</td>
+        <td>{{ item.function }}</td>
         <td>{{ item.created_at }}</td>
       </tr>
     </tbody>
@@ -46,14 +48,14 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
   </form>
 </div>
 
 <script>
 var vm = new Vue({
-  el: '#admin-login-history',
+  el: '#admin-activity',
   data: {
     list: [],
     search: 'name',
@@ -83,7 +85,7 @@ var vm = new Vue({
         // sort: vm.sort,
         // direction: vm.direction,
       });
-      axios.get('/api/admin/login_history?' + params).then(function (response) {
+      axios.get('/api/admin/activity?' + params).then(function (response) {
         if (response.status == 200) {
           vm.list = response.data.list;
           vm.paginate = response.data.paginate;

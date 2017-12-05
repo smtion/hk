@@ -18,7 +18,6 @@
     <canvas id="myChart" width="400" height="100"></canvas>
   </div>
 
-
   <div class="margin-top-2">
     <div class="clearfix">
       <p class="pull-left">
@@ -40,12 +39,12 @@
       <tr>
         <td>시세</td>
         <td v-for="d in dates">{{ list[d] ? list[d]['price'] : '' }}</td>
-        <td><input type="number" class="form-control" v-model="data.price"></td>
+        <td><input id="price" type="number" class="form-control" v-model="data.price"></td>
       </tr>
       <tr>
         <td>매입가</td>
         <td v-for="d in dates">{{ list[d] ? list[d]['buy_price'] : '' }}</td>
-        <td><input type="number" class="form-control" v-model="data.buy_price"></td>
+        <td><input id="buy_price" type="number" class="form-control" v-model="data.buy_price"></td>
       </tr>
     </tbody>
   </table>
@@ -77,9 +76,6 @@ var vm = new Vue({
       vm.make();
       vm.dates.push(vm.$options.filters['jsdate'](-2));
       vm.dates.push(vm.$options.filters['jsdate'](-1));
-      // vm.data.date = new Date().toLocaleDateString('ko-KR').replace(/\. /g, '-').replace(/\./g, '');
-      // vm.dates.push(new Date(new Date().setDate(new Date().getDate() - 2)).toLocaleDateString('ko-KR').replace(/\. /g, '-').replace(/\./g, ''));
-      // vm.dates.push(new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString('ko-KR').replace(/\. /g, '-').replace(/\./g, ''));
       vm.draw();
       vm.get();
       vm.get2();
@@ -100,17 +96,17 @@ var vm = new Vue({
       vm.chart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: [],//vm.labels,
+          labels: [],
           datasets: [{
             label: '시세',
-            data: [],//vm.data1,
+            data: [],
             fill: false,
             backgroundColor: 'rgba(255, 99, 132, 0.2)',
             borderColor: 'rgba(255,99,132,1)',
             borderWidth: 1
           }, {
             label: '매입가',
-            data: [],//vm.data2,
+            data: [],
             fill: false,
             backgroundColor: 'rgba(54, 162, 235, 0.2)',
             borderColor: 'rgba(54, 162, 235, 1)',
@@ -121,8 +117,6 @@ var vm = new Vue({
           tooltips: {
             callbacks: {
               title: function (tooltipItem, data) {
-                // console.log(data.datasets[tooltipItem[0].datasetIndex].label);
-                // return tooltipItem[0].xLabel + ' : ' + tooltipItem[0].yLabel;
                 return data.datasets[tooltipItem[0].datasetIndex].label + ' : ' + vm.$options.filters['number'](tooltipItem[0].yLabel);
               },
               label: function (tooltipItem, data) {
@@ -132,7 +126,6 @@ var vm = new Vue({
           },
           scales: {
             xAxes: [{
-              // display: false,
               // barThickness : 30,
               barPercentage: 0.9,
             }],
@@ -180,7 +173,22 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.price) {
+        alert('시세를 입력하세요.');
+        $('#price').focus();
+        return false;
+      } else if (!vm.data.buy_price) {
+        alert('매입가를 입력하세요.');
+        $('#buy_price').focus();
+        return false;
+      }
+
+      return true;
+    },
     save: function () {
+      if (!vm.validate()) return;
+
       vm.data.date = vm.$options.filters['jsdate']();
       axios.put('/api/purchase/aluminum', vm.data).then(function (response) {
         if (response.status == 200) {

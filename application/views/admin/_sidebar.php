@@ -5,7 +5,8 @@
   <a href="/admin/dept" class="list-group-item">부서 관리</a>
   <a href="/admin/position" class="list-group-item">직급 관리</a>
   <!-- <label class="list-group-item list-group-item-info">사용자 이력 조회</label> -->
-  <a href="/admin/login_history" class="list-group-item">사용자 접속 정보</a>
+  <a href="/admin/login" class="list-group-item">사용자 접속 정보</a>
+  <a href="/admin/activity" class="list-group-item">사용자 활동 정보</a>
   <!-- <label class="list-group-item list-group-item-info">운영 이력 조회</label>
   <a href="/admin/users" class="list-group-item">이력 상세 조회</a> -->
 

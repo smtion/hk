@@ -46,7 +46,7 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
         <option value="code">견적번호</option>
@@ -57,9 +57,9 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">
@@ -72,10 +72,9 @@
         <div class="modal-body">
           <div class="form-horizontal">
             <div class="form-group">
-              <label class="col-sm-4 control-label">프로젝트 이름
-              {{data.id}}</label>
+              <label class="col-sm-4 control-label">프로젝트 이름</label>
               <div class="col-sm-8">
-                <select class="form-control" v-model="data.project_id" v-show="!data.id">
+                <select id="project" class="form-control" v-model="data.project_id" v-show="!data.id">
                   <option value="">선택하세요.</option>
                   <!-- <option v-for="(item, index) in projects" :value="index">{{ item.name }}</option> -->
                   <option v-for="item in projects" :value="item.id">{{ item.name }}</option>
@@ -149,7 +148,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">견적서 발행일</label>
               <div class="col-sm-8">
-                <input type="date" class="form-control" v-model="data.publish_date">
+                <input id="publish_date" type="date" class="form-control" v-model="data.publish_date">
               </div>
             </div>
             <div class="form-group">
@@ -298,7 +297,22 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.id && !vm.data.project_id) {
+        alert('프로젝트를 선택하세요.');
+        $('#project').focus();
+        return false;
+      } else if (!vm.data.publish_date) {
+        alert('견적서 발행일을 입력하세요.');
+        $('#publish_date').focus();
+        return false;
+      }
+
+      return true;
+    },
     create: function () {
+      if (!vm.validate()) return;
+
       vm.data.payment_term = vm.pt.ns ? 0 : vm.pt.m * 30 + vm.pt.d;
       vm.data.delivery_term = vm.dt.ns ? 0 : vm.dt.m * 30 + vm.dt.d;
 
@@ -311,6 +325,8 @@ var vm = new Vue({
       });
     },
     update: function () {
+      if (!vm.validate()) return;
+      
       var data = {
         id: vm.data.id,
         payment_term: vm.pt.ns ? 0 : vm.pt.m * 30 + vm.pt.d,

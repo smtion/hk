@@ -59,7 +59,7 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
         <option value="name">옵션명</option>
@@ -70,9 +70,9 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalOption" tabindex="-1" role="dialog" aria-labelledby="modalOptionLabel">
@@ -87,7 +87,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">옵션명</label>
               <div class="col-sm-8">
-                <select class="form-control" v-model="option_index" @change="getOptionDetail2()" v-show="!data.id">
+                <select id="parts" class="form-control" v-model="option_index" @change="getOptionDetail2()" v-show="!data.id">
                   <option value="">선택하세요.</option>
                   <option v-for="(item, index) in options" :value="index">{{ item.name }}</option>
                 </select>
@@ -159,6 +159,7 @@ var vm = new Vue({
         details: {},
       };
       vm.option_index = '';
+      vm.option_detail2 = [];
     },
     reload: function () {
       vm.reset();
@@ -232,7 +233,28 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.id && vm.option_index === '') {
+        alert('옵션 구성을 선택하세요.');
+        $('#parts').focus();
+        return false;
+      }
+      var flag = false;
+      Object.keys(vm.data.details).forEach(function (v) {
+        if (vm.data.details[v]) {
+          flag = true;
+        }
+      });
+      if (Object.keys(vm.data.details).length && !flag) {
+        alert('옵션 구성 항목을 하나 이상 선택하세요.');
+        return false;
+      }
+
+      return true;
+    },
     create: function () {
+      if (!vm.validate()) return;
+
       axios.post('/api/purchase/option_list', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');
@@ -242,6 +264,8 @@ var vm = new Vue({
       });
     },
     update: function () {
+      if (!vm.validate()) return;
+
       axios.patch('/api/purchase/option_list', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');

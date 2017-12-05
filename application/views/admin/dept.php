@@ -45,7 +45,7 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
   </form>
 
@@ -135,7 +135,18 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.name) {
+        alert('이름을 입력하세요.');
+        $('#name').focus();
+        return false;
+      }
+
+      return true;
+    },
     create: function () {
+      if (!vm.validate()) return;
+
       axios.post('/api/admin/dept', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');
@@ -145,6 +156,8 @@ var vm = new Vue({
       });
     },
     update: function () {
+      if (!vm.validate()) return;
+
       axios.patch('/api/admin/dept', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');

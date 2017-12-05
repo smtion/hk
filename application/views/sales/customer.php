@@ -41,7 +41,7 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
         <option value="corp_name">회사이름</option>
@@ -52,9 +52,9 @@
       <input type="text" class="form-control" v-model="keyword">
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-primary btn-block" @click="goPage()">검색</button>
+      <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">
@@ -69,7 +69,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">회사이름 한글</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="data.corp_name">
+                <input id="corp_name" type="text" class="form-control" v-model="data.corp_name">
               </div>
             </div>
             <div class="form-group">
@@ -81,13 +81,13 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">국가</label>
               <div class="col-sm-8">
-                <input type="phone" class="form-control" v-model="data.country">
+                <input id="country" type="phone" class="form-control" v-model="data.country">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-4 control-label">사업자등록번호</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="data.regno">
+                <input id="regno" type="text" class="form-control" v-model="data.regno">
               </div>
             </div>
             <div class="form-group">
@@ -105,7 +105,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">담당자 이름 국문</label>
               <div class="col-sm-3">
-                <input type="text" class="form-control" v-model="data.name">
+                <input id="name" type="text" class="form-control" v-model="data.name">
               </div>
               <div class="col-sm-3">
                 <select class="form-control" v-model="pos" @change="selectPosition()">
@@ -146,19 +146,19 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">회사번호</label>
               <div class="col-sm-8">
-                <input type="phone" class="form-control" v-model="data.tel">
+                <input id="tel" type="phone" class="form-control" v-model="data.tel">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-4 control-label">핸드폰번호</label>
               <div class="col-sm-8">
-                <input type="phone" class="form-control" v-model="data.phone">
+                <input id="phone" type="phone" class="form-control" v-model="data.phone">
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-4 control-label">Email 주소</label>
+              <label class="col-sm-4 control-label">이메일주소</label>
               <div class="col-sm-8">
-                <input type="email" class="form-control" v-model="data.email">
+                <input id="email" type="email" class="form-control" v-model="data.email">
               </div>
             </div>
             <div class="form-group">
@@ -401,7 +401,42 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.corp_name) {
+        alert('회사이름을 입력하세요.');
+        $('#corp_name').focus();
+        return false;
+      } else if (!vm.data.country) {
+        alert('국가를 입력하세요.');
+        $('#country').focus();
+        return false;
+      } else if (!vm.data.regno) {
+        alert('사업자등록번호를 입력하세요.');
+        $('#regno').focus();
+        return false;
+      } else if (!vm.data.name) {
+        alert('담장자 이름을 입력하세요.');
+        $('#name').focus();
+        return false;
+      } else if (!vm.data.tel) {
+        alert('회사번호를 입력하세요.');
+        $('#tel').focus();
+        return false;
+      } else if (!vm.data.phone) {
+        alert('휴대폰번호를 입력하세요.');
+        $('#phone').focus();
+        return false;
+      } else if (!vm.data.email) {
+        alert('이메일주소를 입력하세요.');
+        $('#email').focus();
+        return false;
+      }
+
+      return true;
+    },
     create: function () {
+      if (!vm.validate()) return;
+
       axios.post('/api/sales/customer', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');
@@ -411,6 +446,8 @@ var vm = new Vue({
       });
     },
     update: function () {
+      if (!vm.validate()) return;
+
       axios.patch('/api/sales/customer', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');

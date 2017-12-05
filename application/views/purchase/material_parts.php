@@ -39,7 +39,7 @@
     </paginate>
   </div>
 
-  <div class="row">
+  <form class="row" @submit.prevent>
     <div class="col-sm-offset-2 col-sm-2">
       <select class="form-control" v-model="search">
         <option value="code">부자재 구성 코드</option>
@@ -54,7 +54,7 @@
     <div class="col-sm-2">
       <button class="btn btn-primary btn-block" @click="goPage(1)">검색</button>
     </div>
-  </div>
+  </form>
 
   <!-- Modal -->
   <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="modalCreateLabel">
@@ -75,28 +75,31 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">부자재 구성 명칭</label>
               <div class="col-sm-8">
-                <select name="" class="form-control" v-model="option_index">
+                <select name="" class="form-control margin-top-between-1" v-model="option_index">
                   <option value="">사용자 입력</option>
                   <option v-for="(item, index) in options" :value="index">{{ item.name }}</option>
                 </select>
-                <input type="text" class="form-control" placeholder="" v-model="data.name" v-show="isNaN(parseInt(option_index))">
+                <input id="name" type="text" class="form-control margin-top-between-1" placeholder="" v-model="data.name" v-show="isNaN(parseInt(option_index))">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-4 control-label">부자재 구성 구분</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" placeholder="" v-model="data.type">
+                <input id="type" type="text" class="form-control" placeholder="" v-model="data.type">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-4 control-label">부자재 구성 항목</label>
               <div class="col-sm-8">
-                <div class="input-group margin-top-between-1" v-for="(item, index) in data.values">
+                <div class="input-group margin-top-between-1" v-for="(item, index) in data.values" v-if="!data.id">
                   <input type="text" class="form-control" placeholder="" v-model="data.values[index]">
                   <span class="input-group-btn"><button class="btn btn-default" @click="removeValue(index)">X</button></span>
                 </div>
-                <div class="text-center margin-top-1">
-                  <button class="btn btn-primary btn-sm" @click="addValue()">추가</button>
+                <div class="margin-top-between-1" v-for="(item, index) in data.values" v-if="data.id">
+                  <input type="text" class="form-control" placeholder="" v-model="data.values[index]" disabled>
+                </div>
+                <div class="text-center margin-top-1" v-if="!data.id">
+                  <button class="btn btn-primary" @click="addValue()">추가</button>
                 </div>
               </div>
             </div>
@@ -172,6 +175,23 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.option.name && !vm.data.name) {
+        alert('부자재 구성 명칭을 입력하세요.');
+        $('#name').focus();
+        return false;
+      } else if (!vm.data.type) {
+        alert('부자재 구성 구분을 입력하세요.');
+        $('#type').focus();
+        return false;
+      } else if (!vm.data.values) {
+        alert('부자재 구성 항목을 입력하세요.');
+        $('#value').focus();
+        return false;
+      }
+
+      return true;
+    },
     getList: function (page) {
       if (!page) page = 1;
 
@@ -189,8 +209,32 @@ var vm = new Vue({
         }
       });
     },
+    validate: function () {
+      if (!vm.data.option.name && !vm.data.name) {
+        alert('부자재 구성 명칭을 입력하세요.');
+        $('#name').focus();
+        return false;
+      } else if (!vm.data.type) {
+        alert('부자재 구성 구분을 입력하세요.');
+        $('#type').focus();
+        return false;
+      }
+      var flag = false;
+      Object.keys(vm.data.values).forEach(function (v) {
+        if (vm.data.values[v]) {
+          flag = true;
+        }
+      });
+      if (Object.keys(vm.data.values).length && !flag) {
+        alert('부자재 구성 항목을 하나 이상 입력하세요.');
+        return false;
+      }
+
+      return true;
+    },
     create: function () {
       vm.data.option = isNaN(parseInt(vm.option_index)) ? {} : vm.options[vm.option_index];
+      if (!vm.validate()) return;
 
       axios.post('/api/purchase/material_parts', vm.data).then(function (response) {
         if (response.status == 201) {
@@ -201,6 +245,9 @@ var vm = new Vue({
       });
     },
     update: function () {
+      vm.data.option = isNaN(parseInt(vm.option_index)) ? {} : vm.options[vm.option_index];
+      if (!vm.validate()) return;
+
       axios.patch('/api/purchase/material_parts', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');

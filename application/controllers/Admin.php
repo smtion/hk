@@ -36,9 +36,15 @@ class Admin extends EX_Controller {
     $this->load->view(LAYOUT, $this->cdata);
 	}
 
-  public function login_history()
+  public function login()
 	{
-    $this->cdata->template = 'admin/login_history';
+    $this->cdata->template = 'admin/login';
+    $this->load->view(LAYOUT, $this->cdata);
+	}
+
+  public function activity()
+	{
+    $this->cdata->template = 'admin/activity';
     $this->load->view(LAYOUT, $this->cdata);
 	}
 

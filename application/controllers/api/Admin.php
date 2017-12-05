@@ -59,6 +59,8 @@ class Admin extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
 	}
 
@@ -91,6 +93,7 @@ class Admin extends REST_Controller {
     $data['permission'] = json_encode($data['permission'], JSON_UNESCAPED_UNICODE);
     $this->db->insert('HK_users', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -104,6 +107,7 @@ class Admin extends REST_Controller {
     $data['permission'] = json_encode($data['permission'], JSON_UNESCAPED_UNICODE);
     $result = $this->db->where('id', $data['id'])->update('HK_users', $data);
 
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -135,6 +139,7 @@ class Admin extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -143,6 +148,7 @@ class Admin extends REST_Controller {
     $data = $this->post();
     $this->db->insert('HK_depts', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -152,6 +158,7 @@ class Admin extends REST_Controller {
     $data = $this->patch();
     $result = $this->db->where('id', $data['id'])->update('HK_depts', $data);
 
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -183,6 +190,7 @@ class Admin extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -191,6 +199,7 @@ class Admin extends REST_Controller {
     $data = $this->post();
     $this->db->insert('HK_positions', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -200,6 +209,7 @@ class Admin extends REST_Controller {
     $data = $this->patch();
     $result = $this->db->where('id', $data['id'])->update('HK_positions', $data);
 
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -207,7 +217,7 @@ class Admin extends REST_Controller {
   //-----------------------------------------------------------------------
   // Login history
   //-----------------------------------------------------------------------
-  public function login_history_get()
+  public function login_get()
 	{
     $page = $this->get('page');
     $limit = 10;
@@ -237,6 +247,44 @@ class Admin extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
+    $this->response($response, REST_Controller::HTTP_OK);
+	}
+
+  //-----------------------------------------------------------------------
+  // Activity log
+  //-----------------------------------------------------------------------
+  public function activity_get()
+	{
+    $page = $this->get('page');
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
+
+    $this->db->start_cache();
+    $this->db->from('HK_activity_log h')->join('HK_users u', 'h.user_id = u.id')
+    ->join('HK_depts d', 'u.dept_id = d.id', 'left outer')->join('HK_positions p', 'u.position_id = p.id', 'left outer');
+    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
+      if ($search == 'name') {
+        $this->db->like('u.name', $keyword);
+      } elseif ($search == 'dept') {
+        $this->db->like('d.name', $keyword);
+      }
+    }
+    $this->db->stop_cache();
+
+    $total = $this->db->count_all_results();
+    $list = $this->db->select('h.*, u.name, d.name dept_name, p.name position_name')->order_by('h.id desc')->get(null, $limit, $offset)->result_array();
+
+    $response = [
+      'paginate' => [
+        'total' => $total,
+        'page' => $page,
+        'limit' => $limit
+      ],
+      'list' => $list
+    ];
+
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
 	}
 
@@ -251,6 +299,7 @@ class Admin extends REST_Controller {
       'item' => $item
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
 	}
 
@@ -265,6 +314,7 @@ class Admin extends REST_Controller {
       $result = $this->db->insert_id();
     }
 
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }

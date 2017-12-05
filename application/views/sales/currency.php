@@ -55,20 +55,22 @@ var vm = new Vue({
   },
   methods: {
     init: function() {
-      vm.data.date = new Date().toLocaleDateString('ko-KR').replace(/\. /g, '-').replace(/\./g, '');
-      vm.dates.push(new Date(new Date().setDate(new Date().getDate() - 2)).toLocaleDateString('ko-KR').replace(/\. /g, '-').replace(/\./g, ''));
-      vm.dates.push(new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString('ko-KR').replace(/\. /g, '-').replace(/\./g, ''));
+      vm.data.date = vm.$options.filters['jsdate']();
+      vm.dates.push(vm.$options.filters['jsdate'](-2));
+      vm.dates.push(vm.$options.filters['jsdate'](-1));
       vm.search();
     },
     search: function () {
       axios.get('/api/sales/currency').then(function (response) {
         if (response.status == 200) {
           vm.list = response.data.list;
-          vm.data.currency = response.data.data;
+          // console.log(response.data.data.length);
+          vm.data.currency = response.data.data.length === undefined? response.data.data : {};
         }
       });
     },
     save: function () {
+      console.log(vm.data.currency);
       axios.put('/api/sales/currency', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('저장되었습니다.')

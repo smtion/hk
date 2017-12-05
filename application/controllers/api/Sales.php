@@ -53,6 +53,7 @@ class Sales extends REST_Controller {
       'data' => $data
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
 	}
 
@@ -74,6 +75,7 @@ class Sales extends REST_Controller {
       }
     }
 
+    activity_log();
     $this->response(null, REST_Controller::HTTP_OK);
   }
 
@@ -106,7 +108,7 @@ class Sales extends REST_Controller {
 
     $this->db->start_cache();
     $this->db->select('oc.*, o.name, o.details, c.corp_name')->from('HK_option_customer oc')
-      ->join('HK_customers c', 'oc.customer_id = c.id')->join('HK_option o', 'oc.option_id = o.id');
+      ->join('HK_customers c', 'oc.customer_id = c.id')->join('HK_options o', 'oc.option_id = o.id');
     if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
       if ($search == 'name') {
         $this->db->like('o.name', $keyword);
@@ -138,6 +140,7 @@ class Sales extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -147,7 +150,7 @@ class Sales extends REST_Controller {
       $this->response(null, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    $list = $this->db->select('o.*')->from('HK_option o')
+    $list = $this->db->select('o.*')->from('HK_options o')
             ->join('HK_option_customer c', 'c.customer_id = ' . $id . ' AND c.option_id = o.id', 'left outer')
             ->where('c.id IS NULL')->group_by('o.id')->order_by('o.id desc')->get()->result_array();
 
@@ -168,6 +171,7 @@ class Sales extends REST_Controller {
     $data = $this->post();
     $result = $this->db->insert('HK_option_customer', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -183,16 +187,17 @@ class Sales extends REST_Controller {
           'option_price_id' => $data['option_price_id']
         ])->count_all_results('HK_option_customer_price')
       ) {
-        $this->db->where([
+        $result = $this->db->where([
           'option_customer_id' => $data['option_customer_id'],
           'option_id' => $data['option_id'],
           'option_price_id' => $data['option_price_id']])->update('HK_option_customer_price', $data);
       } else {
         $this->db->insert('HK_option_customer_price', $data);
+        $result = $this->db->insert_id();
       }
     }
-    // $result = $this->db->where('id', $data['id'])->update('HK_option_customer_price', $data);
-    $result = true;
+
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -210,7 +215,7 @@ class Sales extends REST_Controller {
 
     $this->db->start_cache();
     $this->db->select('mc.*, o.name, o.details, c.corp_name')->from('HK_material_customer mc')
-      ->join('HK_customers c', 'mc.customer_id = c.id')->join('HK_material o', 'mc.material_id = o.id');
+      ->join('HK_customers c', 'mc.customer_id = c.id')->join('HK_materials o', 'mc.material_id = o.id');
     if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
       if ($search == 'name') {
         $this->db->like('o.name', $keyword);
@@ -242,6 +247,7 @@ class Sales extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -251,7 +257,7 @@ class Sales extends REST_Controller {
       $this->response(null, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    $list = $this->db->select('m.*')->from('HK_material m')
+    $list = $this->db->select('m.*')->from('HK_materials m')
             ->join('HK_material_customer c', 'c.customer_id = ' . $id . ' AND c.material_id = m.id', 'left outer')
             ->where('c.id IS NULL')->group_by('m.id')->order_by('m.id desc')->get()->result_array();
 
@@ -272,6 +278,7 @@ class Sales extends REST_Controller {
     $data = $this->post();
     $this->db->insert('HK_material_customer', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -287,16 +294,17 @@ class Sales extends REST_Controller {
           'material_price_id' => $data['material_price_id']
         ])->count_all_results('HK_material_customer_price')
       ) {
-        $this->db->where([
+        $result = $this->db->where([
           'material_customer_id' => $data['material_customer_id'],
           'material_id' => $data['material_id'],
           'material_price_id' => $data['material_price_id']])->update('HK_material_customer_price', $data);
       } else {
         $this->db->insert('HK_material_customer_price', $data);
+        $result = $this->db->insert_id();
       }
     }
-    // $result = $this->db->where('id', $data['id'])->update('HK_option_customer_price', $data);
-    $result = true;
+
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -314,7 +322,7 @@ class Sales extends REST_Controller {
 
     $this->db->start_cache();
     $this->db->select('mc.*, o.name, o.details, c.corp_name')->from('HK_cost_customer mc')
-      ->join('HK_customers c', 'mc.customer_id = c.id')->join('HK_cost o', 'mc.cost_id = o.id');
+      ->join('HK_customers c', 'mc.customer_id = c.id')->join('HK_costs o', 'mc.cost_id = o.id');
     if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
       if ($search == 'name') {
         $this->db->like('o.name', $keyword);
@@ -346,6 +354,7 @@ class Sales extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -355,7 +364,7 @@ class Sales extends REST_Controller {
       $this->response(null, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    $list = $this->db->select('m.*')->from('HK_cost m')
+    $list = $this->db->select('m.*')->from('HK_costs m')
             ->join('HK_cost_customer c', 'c.customer_id = ' . $id . ' AND c.cost_id = m.id', 'left outer')
             ->where('c.id IS NULL')->group_by('m.id')->order_by('m.id desc')->get()->result_array();
 
@@ -391,16 +400,17 @@ class Sales extends REST_Controller {
           'cost_price_id' => $data['cost_price_id']
         ])->count_all_results('HK_cost_customer_price')
       ) {
-        $this->db->where([
+        $result = $this->db->where([
           'cost_customer_id' => $data['cost_customer_id'],
           'cost_id' => $data['cost_id'],
           'cost_price_id' => $data['cost_price_id']])->update('HK_cost_customer_price', $data);
       } else {
         $this->db->insert('HK_cost_customer_price', $data);
+        $result = $this->db->insert_id();
       }
     }
-    // $result = $this->db->where('id', $data['id'])->update('HK_option_customer_price', $data);
-    $result = true;
+
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -418,7 +428,7 @@ class Sales extends REST_Controller {
 
     $this->db->start_cache();
     $this->db->select('mc.*, p.model, c.corp_name')->from('HK_product_customer mc')
-      ->join('HK_customers c', 'mc.customer_id = c.id')->join('HK_product p', 'mc.product_id = p.id');
+      ->join('HK_customers c', 'mc.customer_id = c.id')->join('HK_products p', 'mc.product_id = p.id');
     if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
       if ($search == 'name') {
         $this->db->like('p.name', $keyword);
@@ -450,49 +460,7 @@ class Sales extends REST_Controller {
       'list' => $list
     ];
 
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function project_check_get()
-  {
-    if (!$name = $this->get('name')) {
-      $this->response(null, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
-    }
-
-    $result = $this->db->where('name', $name)->count_all_results('HK_projects');
-
-    $response = [
-      'result' => !$result
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function project_search_get()
-  {
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    if ($keyword = $this->get('keyword')) {
-      $this->db->start_cache();
-      $this->db->like('corp_name', $keyword);
-      $this->db->or_like('corp_name_en', $keyword);
-      $this->db->stop_cache();
-    }
-
-    $total = $this->db->count_all_results('HK_customers');
-    $list = $this->db->get('HK_customers')->result_array();
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -502,7 +470,7 @@ class Sales extends REST_Controller {
       $this->response(null, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    $list = $this->db->select('p.*')->from('HK_product p')
+    $list = $this->db->select('p.*')->from('HK_products p')
             ->join('HK_product_customer c', 'c.customer_id = ' . $id . ' AND c.product_id = p.id', 'left outer')
             ->where('c.id IS NULL')->group_by('p.id')->order_by('p.id desc')->get()->result_array();
 
@@ -518,6 +486,7 @@ class Sales extends REST_Controller {
     $data = $this->post();
     $this->db->insert('HK_product_customer', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -533,16 +502,17 @@ class Sales extends REST_Controller {
           'product_price_id' => $data['product_price_id']
         ])->count_all_results('HK_product_customer_price')
       ) {
-        $this->db->where([
+        $result = $this->db->where([
           'product_customer_id' => $data['product_customer_id'],
           'product_id' => $data['product_id'],
           'product_price_id' => $data['product_price_id']])->update('HK_product_customer_price', $data);
       } else {
         $this->db->insert('HK_product_customer_price', $data);
+        $result = $this->db->insert_id();
       }
     }
-    // $result = $this->db->where('id', $data['id'])->update('HK_option_customer_price', $data);
-    $result = true;
+
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -576,6 +546,7 @@ class Sales extends REST_Controller {
       'list' => $list
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -584,6 +555,7 @@ class Sales extends REST_Controller {
     $data = $this->post();
     $result = $this->db->insert('HK_customers', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -593,6 +565,7 @@ class Sales extends REST_Controller {
     $data = $this->patch();
     $result = $this->db->where('id', $data['id'])->update('HK_customers', $data);
 
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -641,14 +614,62 @@ class Sales extends REST_Controller {
       ];
     }
 
+    activity_log();
+    $this->response($response, REST_Controller::HTTP_OK);
+  }
+
+  public function project_check_get()
+  {
+    if (!$name = $this->get('name')) {
+      $this->response(null, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    $result = $this->db->where('name', $name)->count_all_results('HK_projects');
+
+    $response = [
+      'result' => !$result
+    ];
+
+    $this->response($response, REST_Controller::HTTP_OK);
+  }
+
+  public function project_search_get()
+  {
+    $page = $this->get('page');
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
+
+    if ($keyword = $this->get('keyword')) {
+      $this->db->start_cache();
+      $this->db->like('corp_name', $keyword);
+      $this->db->or_like('corp_name_en', $keyword);
+      $this->db->stop_cache();
+    }
+
+    $total = $this->db->count_all_results('HK_customers');
+    $list = $this->db->get('HK_customers')->result_array();
+
+    $response = [
+      'paginate' => [
+        'total' => $total,
+        'page' => $page,
+        'limit' => $limit
+      ],
+      'list' => $list
+    ];
+
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
   public function project_post()
   {
     $data = $this->post();
+    if ($this->db->where('name', $data['name'])->count_all_results('HK_projects')) {
+      $this->response(NULL, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
+    }
     $result = $this->db->insert('HK_projects', $data);
 
+    activity_log();
     if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -656,8 +677,13 @@ class Sales extends REST_Controller {
   public function project_patch()
   {
     $data = $this->patch();
+    if ($this->db->where('name', $data['name'])->where_not_in('id', [$data['id']])->count_all_results('HK_projects')) {
+      $this->response(NULL, REST_Controller::HTTP_UNPROCESSABLE_ENTITY);
+    }
     $result = $this->db->where('id', $data['id'])->update('HK_projects', $data);
+    $result = $this->db->where('name', $name)->count_all_results('HK_projects');
 
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -674,36 +700,7 @@ class Sales extends REST_Controller {
 
       $response = [
         'item' => $item,
-        // 'selected' => [],
-        // 'data' => [],
       ];
-
-      // $details = $this->db->where('quotation_id', $id)->get('HK_quotation_detail')->result_array();
-      //
-      // foreach ($details as $item) {
-      //   if ($item['type'] == 'product') {
-      //     $table = 'HK_product';
-      //   } else if ($item['type'] == 'option') {
-      //     $table = 'HK_option_list';
-      //   } else if ($item['type'] == 'material') {
-      //     $table = 'HK_material_list';
-      //   } else if ($item['type'] == 'cost') {
-      //     $table = 'HK_cost_list';
-      //   }
-      //
-      //   $detail = $this->db->where('id', $item['type_id'])->get($table)->row_array();
-      //
-      //   if (in_array($item['type'], ['option', 'material', 'cost'])) {
-      //     $detail['details'] = json_decode($detail['details']);
-      //     // $detail = array_map(function ($tmp) {
-      //     //   $tmp['details'] = json_decode($tmp['details']);
-      //     //   return $tmp;
-      //     // }, $detail);
-      //   }
-      //
-      //   $response['selected'][$item['type']] = $detail;
-      //   $response['data'][$item['type']] = $item;
-      // }
     } else {
       $page = $this->get('page');
       $limit = 10;
@@ -729,6 +726,7 @@ class Sales extends REST_Controller {
       ];
     }
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
@@ -753,6 +751,7 @@ class Sales extends REST_Controller {
     $code = 'AAAA' . str_pad($new_id, 5, '0', STR_PAD_LEFT);
     $this->db->where('id', $new_id)->update('HK_quotations', ['code' => $code]);
 
+    activity_log();
     if ($new_id) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
@@ -762,13 +761,14 @@ class Sales extends REST_Controller {
     $data = $this->patch();
     $result = $this->db->where('id', $data['id'])->update('HK_quotations', $data);
 
+    activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
 
   public function quotation_products_get($customer_id = 0)
   {
-    $list = $this->db->select('p.*, c.customer_id')->from('HK_product p')->join('HK_product_customer c', 'p.id = c.product_id')
+    $list = $this->db->select('p.*, c.customer_id')->from('HK_products p')->join('HK_product_customer c', 'p.id = c.product_id')
             ->where('c.customer_id', $customer_id)->get()->result_array();
 
     $list = array_map(function ($item) {
@@ -849,744 +849,15 @@ class Sales extends REST_Controller {
   public function quotation_detail_post()
   {
     $data = $this->post();
-    // $loop = ['product', 'option', 'material', 'cost'];
-    //
-    // foreach ($loop as $type) {
-    //   if (isset($data[$type]['type_id'])) {
-    //     if ($this->db->where(['quotation_id' => $data['id'], 'type' => $type, 'type_id' => $data[$type]['type_id']])->count_all_results('HK_quotation_detail')) {
-    //       $this->db->where(['quotation_id' => $data['id'], 'type' => $type, 'type_id' => $data[$type]['type_id']])->update('HK_quotation_detail', $data[$type]);
-    //     } else {
-    //       $data[$type]['quotation_id'] = $data['id'];
-    //       $data[$type]['type'] = $type;
-    //
-    //       $this->db->insert('HK_quotation_detail', $data[$type]);
-    //     }
-    //   }
-    // }
     $data['set'] = json_encode($data['set'], JSON_UNESCAPED_UNICODE);
     $this->db->insert('HK_quotation_detail', $data);
     $new_id = $this->db->insert_id();
 
     $this->db->set('total', $data['total'])->where('id', $data['quotation_id'])->update('HK_quotations');
 
+    activity_log();
     if ($new_id) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //-----------------------------------------------------------------------
-  // Option price
-  //-----------------------------------------------------------------------
-  public function option_price_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    $this->db->start_cache();
-    $this->db->where('prices IS NOT NULL');
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->like($search, $keyword);
-    }
-    $this->db->stop_cache();
-
-    $total = $this->db->count_all_results('HK_option_list');
-    $list = $this->db->get('HK_option_list', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      $item['prices'] = json_decode($item['prices']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function option_price_editable_get()
-  {
-    $id = $this->get('id');
-    $list = $this->db->where('id', $id)->get('HK_option_list')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function option_price_patch()
-  {
-    $data = $this->patch();
-    $data['prices'] = json_encode($data['prices'], JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_option_list', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  public function option_price_with_relation_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    $this->db->start_cache();
-    $this->db->from('HK_option_price p')->join('HK_option_list l', 'p.opt_id = l.id');
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->like('l.' . $search, $keyword);
-    }
-    $this->db->stop_cache();
-
-    $total = $this->db->count_all_results();
-    $list = $this->db->select('p.*, l.name, l.details')->get(null, $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function option_price_creatabl_with_relatione_get()
-	{
-    $list = $this->db->select('l.*, l.id opt_id')->from('HK_option_price p')->join('HK_option_list l', 'p.opt_id = l.id', 'right outer')
-            ->where('p.id IS NULL')->get()->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function option_price_editable_with_relation_get()
-  {
-    $opt_id = $this->get('opt_id');
-    $list = $this->db->where('opt_id', $opt_id)->order_by('start_date')->get('HK_option_price')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function option_price_with_relation_post()
-  {
-    $data = $this->post();
-    $this->db->insert('HK_option_price', $data);
-
-    if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-
-
-  //-----------------------------------------------------------------------
-  // Material parts
-  //-----------------------------------------------------------------------
-  public function material_parts_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->start_cache();
-      $this->db->like($search, $keyword);
-      $this->db->stop_cache();
-    }
-
-    $total = $this->db->count_all_results('HK_material_parts');
-    $list = $this->db->get('HK_material_parts', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['values'] = json_decode($item['values']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function material_parts_name_get()
-  {
-    $list = $this->db->select('name')->group_by('name')->get('HK_material_parts')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function material_parts_post()
-  {
-    $data = $this->post();
-    $new = [
-      'name' => isset($data['option']['name']) ? $data['option']['name'] : $data['name'],
-      'type' => $data['type'],
-      'values' => json_encode(array_filter($data['values'], function ($v) { if (trim($v) ) return $v; }), JSON_UNESCAPED_UNICODE),
-    ];
-    $this->db->insert('HK_material_parts', $new);
-    $new_id = $this->db->insert_id();
-
-    $code = str_pad($new_id, 6, '0', STR_PAD_LEFT);
-    $this->db->where('id', $new_id)->update('HK_material_parts', ['code' => $code]);
-
-    if ($new_id) $this->response(NULL, REST_Controller::HTTP_CREATED);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  public function material_parts_patch()
-  {
-    $data = $this->patch();
-    $data['values'] = json_encode(array_filter($data['values'], function ($v) { if (trim($v) ) return $v; }), JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_material_parts', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  //-----------------------------------------------------------------------
-  // Material list
-  //-----------------------------------------------------------------------
-  public function material_list_get()
-  {
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->start_cache();
-      $this->db->like($search, $keyword);
-      $this->db->stop_cache();
-    }
-
-    $total = $this->db->count_all_results('HK_material_list');
-    $list = $this->db->get('HK_material_list', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      $item['prices'] = json_decode($item['prices']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function material_detail2_get()
-  {
-    $name = $this->get('name');
-    $list = $this->db->where('name', $name)->get('HK_material_parts')->result_array();
-
-    $list = array_map(function ($item) {
-      $item['values'] = json_decode($item['values']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function material_list_post()
-  {
-    $data = $this->post();
-    $data['details'] = json_encode($data['details'], JSON_UNESCAPED_UNICODE);
-    $this->db->insert('HK_material_list', $data);
-
-    if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  public function material_list_patch()
-  {
-    $data = $this->patch();
-    $data['details'] = json_encode($data['details'], JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_material_list', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  //-----------------------------------------------------------------------
-  // Material price
-  //-----------------------------------------------------------------------
-  public function material_price_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    $this->db->start_cache();
-    $this->db->where('prices IS NOT NULL');
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->like($search, $keyword);
-    }
-    $this->db->stop_cache();
-
-    $total = $this->db->count_all_results('HK_material_list');
-    $list = $this->db->get('HK_material_list', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      $item['prices'] = json_decode($item['prices']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function material_price_creatable_get()
-	{
-    $list = $this->db->where('prices IS NULL')->get('HK_material_list')->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function material_price_editable_get()
-  {
-    $id = $this->get('id');
-    $list = $this->db->where('id', $id)->get('HK_material_list')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function material_price_patch()
-  {
-    $data = $this->patch();
-    $data['prices'] = json_encode($data['prices'], JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_material_list', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-
-
-  //-----------------------------------------------------------------------
-  // Cost parts
-  //-----------------------------------------------------------------------
-  public function cost_parts_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->start_cache();
-      $this->db->like($search, $keyword);
-      $this->db->stop_cache();
-    }
-
-    $total = $this->db->count_all_results('HK_cost_parts');
-    $list = $this->db->get('HK_cost_parts', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['values'] = json_decode($item['values']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function cost_parts_name_get()
-  {
-    $list = $this->db->select('name')->group_by('name')->get('HK_cost_parts')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function cost_parts_post()
-  {
-    $data = $this->post();
-    $new = [
-      'name' => isset($data['option']['name']) ? $data['option']['name'] : $data['name'],
-      'type' => $data['type'],
-      'values' => json_encode(array_filter($data['values'], function ($v) { if (trim($v) ) return $v; }), JSON_UNESCAPED_UNICODE),
-    ];
-    $this->db->insert('HK_cost_parts', $new);
-    $new_id = $this->db->insert_id();
-
-    $code = str_pad($new_id, 6, '0', STR_PAD_LEFT);
-    $this->db->where('id', $new_id)->update('HK_cost_parts', ['code' => $code]);
-
-    if ($new_id) $this->response(NULL, REST_Controller::HTTP_CREATED);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  public function cost_parts_patch()
-  {
-    $data = $this->patch();
-    $data['values'] = json_encode(array_filter($data['values'], function ($v) { if (trim($v) ) return $v; }), JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_cost_parts', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  //-----------------------------------------------------------------------
-  // Cost list
-  //-----------------------------------------------------------------------
-  public function cost_list_get()
-  {
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->start_cache();
-      $this->db->like($search, $keyword);
-      $this->db->stop_cache();
-    }
-
-    $total = $this->db->count_all_results('HK_cost_list');
-    $list = $this->db->get('HK_cost_list', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      $item['prices'] = json_decode($item['prices']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function cost_detail2_get()
-  {
-    $name = $this->get('name');
-    $list = $this->db->where('name', $name)->get('HK_cost_parts')->result_array();
-
-    $list = array_map(function ($item) {
-      $item['values'] = json_decode($item['values']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function cost_list_post()
-  {
-    $data = $this->post();
-    $data['details'] = json_encode($data['details'], JSON_UNESCAPED_UNICODE);
-    $this->db->insert('HK_cost_list', $data);
-
-    if ($this->db->insert_id()) $this->response(NULL, REST_Controller::HTTP_CREATED);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  public function cost_list_patch()
-  {
-    $data = $this->patch();
-    $data['details'] = json_encode($data['details'], JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_cost_list', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  //-----------------------------------------------------------------------
-  // Cost price
-  //-----------------------------------------------------------------------
-  public function cost_price_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    $this->db->start_cache();
-    $this->db->where('prices IS NOT NULL');
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->like($search, $keyword);
-    }
-    $this->db->stop_cache();
-
-    $total = $this->db->count_all_results('HK_cost_list');
-    $list = $this->db->get('HK_cost_list', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      $item['prices'] = json_decode($item['prices']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function cost_price_creatable_get()
-	{
-    $list = $this->db->where('prices IS NULL')->get('HK_cost_list')->result_array();
-
-    $list = array_map(function ($item) {
-      $item['details'] = json_decode($item['details']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function cost_price_editable_get()
-  {
-    $id = $this->get('id');
-    $list = $this->db->where('id', $id)->get('HK_cost_list')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function cost_price_patch()
-  {
-    $data = $this->patch();
-    $data['prices'] = json_encode($data['prices'], JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_cost_list', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-
-
-  //-----------------------------------------------------------------------
-  // Product list
-  //-----------------------------------------------------------------------
-  public function product_list_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->start_cache();
-      $this->db->like($search, $keyword);
-      $this->db->stop_cache();
-    }
-
-    $total = $this->db->count_all_results('HK_product');
-    $list = $this->db->get('HK_product', $limit, $offset)->result_array();
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function product_list_post()
-  {
-    $data = $this->post();
-    $this->db->insert('HK_product', $data);
-    $new_id = $this->db->insert_id();
-
-    if ($new_id) $this->response(NULL, REST_Controller::HTTP_CREATED);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  public function product_list_patch()
-  {
-    $data = $this->patch();
-    $result = $this->db->where('id', $data['id'])->update('HK_product', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
-
-  //-----------------------------------------------------------------------
-  // Product price
-  //-----------------------------------------------------------------------
-  public function product_price_get()
-	{
-    $page = $this->get('page');
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    $this->db->start_cache();
-    $this->db->where('prices IS NOT NULL');
-    if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
-      $this->db->like($search, $keyword);
-    }
-    $this->db->stop_cache();
-
-    $total = $this->db->count_all_results('HK_product');
-    $list = $this->db->get('HK_product', $limit, $offset)->result_array();
-
-    $list = array_map(function ($item) {
-      $item['prices'] = json_decode($item['prices']);
-      return $item;
-    }, $list);
-
-    $response = [
-      'paginate' => [
-        'total' => $total,
-        'page' => $page,
-        'limit' => $limit
-      ],
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function product_price_creatable_get()
-	{
-    $list = $this->db->where('prices IS NULL')->get('HK_product')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-	}
-
-  public function product_price_editable_get()
-  {
-    $id = $this->get('id');
-    $list = $this->db->where('id', $id)->get('HK_product')->result_array();
-
-    $response = [
-      'list' => $list
-    ];
-
-    $this->response($response, REST_Controller::HTTP_OK);
-  }
-
-  public function product_price_patch()
-  {
-    $data = $this->patch();
-    $data['prices'] = json_encode($data['prices'], JSON_UNESCAPED_UNICODE);
-    $result = $this->db->where('id', $data['id'])->update('HK_product', $data);
-
-    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
-    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-  }
 }
