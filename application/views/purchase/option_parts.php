@@ -96,7 +96,7 @@
                   <span class="input-group-btn"><button class="btn btn-default" @click="removeOptionValue(index)">X</button></span>
                 </div>
                 <div class="margin-top-between-1" v-for="(item, index) in data.values" v-if="data.id">
-                  <input type="text" class="form-control" placeholder="" v-model="data.values[index]" disabled>
+                  <input type="text" class="form-control" placeholder="" v-model="data.values[index]">
                 </div>
                 <div class="text-center margin-top-1" v-if="!data.id">
                   <button class="btn btn-primary" @click="addOptionValue()">추가</button>

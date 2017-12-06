@@ -1,4 +1,4 @@
-<div id="purchase-cost-price">
+<div id="purchase-cost-price" v-cloak>
   <div class="title">간접비 가격</div>
 
   <div class="text-right margin-bottom-1">

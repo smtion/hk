@@ -297,6 +297,84 @@
         </tr>
       </tbody>
     </table>
+
+    <br>
+    <h4>간접비</h4>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Indirect cost</label>
+        <div class="col-sm-4">
+          <select class="form-control" v-model="indexCost[index]">
+            <option value="">선택하세요.</option>
+            <option v-for="(item, index) in costs" :value="index">{{ item.name }}</option>
+          </select>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-success" @click="selectCost(index)">추가</button>
+        </diV>
+      </div>
+    </div>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>간접비명</th>
+          <th>간접비상세</th>
+          <th width="100">수량</th>
+          <th width="150">단가</th>
+          <th width="150">금액</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, j) in selected[index]['costs']">
+          <td>{{ item.name }}</td>
+          <td class="outer-td">
+            <div class="clearfix">
+              <div class="pull-left inner-td" v-for="(v, k) in item.details" v-bind:style="{width: 100 / Object.keys(item.details).length + '%'}">
+                <div>{{ k }}</div>
+                <div>{{ v ? v : '&nbsp;' }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <input type="text" class="form-control" style="margin-bottom: 5px;"
+              @keyup="calulate('costs', index, j)"
+              v-model="data.set[index]['costs']['list'][j]['qty']">
+            <div class="input-group">
+              <input type="text" class="form-control"
+                @keyup="calulate('costs', index, j)"
+                v-model="data.set[index]['costs']['list'][j]['dc_rate']">
+              <span class="input-group-addon">%</span>
+            </div>
+          </td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['costs']['list'][j]['sales_price']" style="margin-bottom: 5px;" readonly>
+            <input type="text" class="form-control" v-model="data.set[index]['costs']['list'][j]['sales_price_dc']" readonly>
+          </td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['costs']['list'][j]['total']" style="margin-bottom: 5px;" readonly>
+            <input type="text" class="form-control" v-model="data.set[index]['costs']['list'][j]['total_dc']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['costs']['total']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">절사</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['costs']['rest']" readonly>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">최종 합계</td>
+          <td>
+            <input type="text" class="form-control" v-model="data.set[index]['costs']['total_final']" readonly>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="text-center margin-top-1">
@@ -318,7 +396,7 @@ var vm = new Vue({
         products: [],
         options: [],
         materials: [],
-        // costs: [],
+        costs: [],
       }
     ],
     projects: [],
@@ -337,9 +415,6 @@ var vm = new Vue({
     selectedOption: undefined,
     selectedMaterial: undefined,
     selectedCost: undefined,
-    selectedOptions: [],
-    selectedMaterials: [],
-    selectedCosts: [],
   },
   mounted: function () {
     this.$nextTick(function () {
@@ -360,12 +435,12 @@ var vm = new Vue({
       vm.indexOption.push('');
       vm.indexMaterial.push('');
       vm.indexCost.push('');
-      vm.selected.push({products: [], options: [], materials: []});
+      vm.selected.push({products: [], options: [], materials: [], costs: []});
       vm.data.set.push({
         products: {total: 0, rest: 0, total_final: 0, list: []},
-        options: {total: 0, rest: 0, total_final: 0,list: []},
-        materials: {total: 0, rest: 0, total_final: 0,list: []},
-        // costs: {total: 0, rest: 0, total_final: 0,list: []}
+        options: {total: 0, rest: 0, total_final: 0, list: []},
+        materials: {total: 0, rest: 0, total_final: 0, list: []},
+        costs: {total: 0, rest: 0, total_final: 0, list: []},
       });
     },
     selectProject: function () {
@@ -379,11 +454,11 @@ var vm = new Vue({
       vm.selected[index]['products'].push(vm.products[vm.indexProduct[index]]);
       vm.data.set[index]['products']['list'].push({
         product_id: vm.products[vm.indexProduct[index]]['id'],
-        sales_price: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price: vm.products[vm.indexProduct[index]]['sales_price'],
         qty: '',
         total: 0,
         total_dc: 0,
-        sales_price_dc: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price_dc: vm.products[vm.indexProduct[index]]['sales_price'],
         dc_rate: '',
       });
     },
@@ -391,11 +466,11 @@ var vm = new Vue({
       vm.selected[index]['options'].push(vm.options[vm.indexOption[index]]);
       vm.data.set[index]['options']['list'].push({
         option_id: vm.options[vm.indexOption[index]]['id'],
-        sales_price: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price: vm.options[vm.indexOption[index]]['sales_price'],
         qty: '',
         total: 0,
         total_dc: 0,
-        sales_price_dc: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price_dc: vm.options[vm.indexOption[index]]['sales_price'],
         dc_rate: '',
       });
     },
@@ -403,23 +478,23 @@ var vm = new Vue({
       vm.selected[index]['materials'].push(vm.materials[vm.indexMaterial[index]]);
       vm.data.set[index]['materials']['list'].push({
         material_id: vm.materials[vm.indexMaterial[index]]['id'],
-        sales_price: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price: vm.materials[vm.indexMaterial[index]]['sales_price'],
         qty: '',
         total: 0,
         total_dc: 0,
-        sales_price_dc: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price_dc: vm.materials[vm.indexMaterial[index]]['sales_price'],
         dc_rate: '',
       });
     },
     selectCost: function (index) {
       vm.selected[index]['costs'].push(vm.costs[vm.indexCost[index]]);
-      vm.data.set[index]['costs'].push({
+      vm.data.set[index]['costs']['list'].push({
         cost_id: vm.costs[vm.indexCost[index]]['id'],
-        sales_price: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price: vm.costs[vm.indexCost[index]]['sales_price'],
         qty: '',
         total: 0,
         total_dc: 0,
-        sales_price_dc: 3000,  // vm.products[vm.indexProduct[index]]['sales_price']
+        sales_price_dc: vm.costs[vm.indexCost[index]]['sales_price'],
         dc_rate: '',
       });
     },
@@ -494,7 +569,7 @@ var vm = new Vue({
     save: function () {
       vm.data.total = 0;
       vm.data.set.forEach(function (set) {
-        vm.data.total += (set.products.total_final + set.options.total_final + set.materials.total_final);
+        vm.data.total += (set.products.total_final + set.options.total_final + set.materials.total_final + set.costs.total_final);
       });
       // console.log(vm.data.total);
 

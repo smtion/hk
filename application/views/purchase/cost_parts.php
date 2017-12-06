@@ -96,7 +96,7 @@
                   <span class="input-group-btn"><button class="btn btn-default" @click="removeValue(index)">X</button></span>
                 </div>
                 <div class="margin-top-between-1" v-for="(item, index) in data.values" v-if="data.id">
-                  <input type="text" class="form-control" placeholder="" v-model="data.values[index]" disabled>
+                  <input type="text" class="form-control" placeholder="" v-model="data.values[index]">
                 </div>
                 <div class="text-center margin-top-1" v-if="!data.id">
                   <button class="btn btn-primary" @click="addValue()">추가</button>
@@ -227,7 +227,7 @@ var vm = new Vue({
     update: function () {
       vm.data.option = isNaN(parseInt(vm.option_index)) ? {} : vm.options[vm.option_index];
       if (!vm.validate()) return;
-      
+
       axios.patch('/api/purchase/cost_parts', vm.data).then(function (response) {
         if (response.status == 200) {
           alert('변경되었습니다.');

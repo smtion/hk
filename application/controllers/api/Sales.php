@@ -800,10 +800,27 @@ class Sales extends REST_Controller {
 
   public function quotation_options_get($customer_id = 0)
   {
-    $list = $this->db->get('HK_option_list')->result_array();
+    $list = $this->db->select('o.*, c.customer_id')->from('HK_options o')->join('HK_option_customer c', 'o.id = c.option_id')
+            ->where('c.customer_id', $customer_id)->get()->result_array();
 
     $list = array_map(function ($item) {
+      $this->db->start_cache();
+      $this->db->select('cp.sales_price')
+        ->from('HK_option_customer c')
+        ->from('HK_option_customer_price cp')
+        ->from('HK_option_price p')
+        ->where('cp.option_id = p.option_id')->where('cp.option_price_id = p.id')->where('c.option_id = p.option_id')
+        ->where('c.customer_id', $item['customer_id'])->where('cp.option_id', $item['id']);
+      $this->db->stop_cache();
+
+      $row = $this->db->where('p.start_date <= ', today())->where('p.end_date >= ', today())->get()->row_array();
+      if (!$row) {
+        $row = $this->db->where('p.start_date <= ', today())->order_by('p.start_date DESC')->get()->row_array();
+      }
+
+      $item['sales_price'] = $row['sales_price'];
       $item['details'] = json_decode($item['details']);
+      $this->db->flush_cache();
       return $item;
     }, $list);
 
@@ -816,10 +833,27 @@ class Sales extends REST_Controller {
 
   public function quotation_materials_get($customer_id = 0)
   {
-    $list = $this->db->get('HK_material_list')->result_array();
+    $list = $this->db->select('m.*, c.customer_id')->from('HK_materials m')->join('HK_material_customer c', 'm.id = c.material_id')
+            ->where('c.customer_id', $customer_id)->get()->result_array();
 
     $list = array_map(function ($item) {
+      $this->db->start_cache();
+      $this->db->select('cp.sales_price')
+        ->from('HK_material_customer c')
+        ->from('HK_material_customer_price cp')
+        ->from('HK_material_price p')
+        ->where('cp.material_id = p.material_id')->where('cp.material_price_id = p.id')->where('c.material_id = p.material_id')
+        ->where('c.customer_id', $item['customer_id'])->where('cp.material_id', $item['id']);
+      $this->db->stop_cache();
+
+      $row = $this->db->where('p.start_date <= ', today())->where('p.end_date >= ', today())->get()->row_array();
+      if (!$row) {
+        $row = $this->db->where('p.start_date <= ', today())->order_by('p.start_date DESC')->get()->row_array();
+      }
+
+      $item['sales_price'] = $row['sales_price'];
       $item['details'] = json_decode($item['details']);
+      $this->db->flush_cache();
       return $item;
     }, $list);
 
@@ -832,10 +866,27 @@ class Sales extends REST_Controller {
 
   public function quotation_costs_get($customer_id = 0)
   {
-    $list = $this->db->get('HK_cost_list')->result_array();
+    $list = $this->db->select('co.*, c.customer_id')->from('HK_costs co')->join('HK_cost_customer c', 'co.id = c.cost_id')
+            ->where('c.customer_id', $customer_id)->get()->result_array();
 
     $list = array_map(function ($item) {
+      $this->db->start_cache();
+      $this->db->select('cp.sales_price')
+        ->from('HK_cost_customer c')
+        ->from('HK_cost_customer_price cp')
+        ->from('HK_cost_price p')
+        ->where('cp.cost_id = p.cost_id')->where('cp.cost_price_id = p.id')->where('c.cost_id = p.cost_id')
+        ->where('c.customer_id', $item['customer_id'])->where('cp.cost_id', $item['id']);
+      $this->db->stop_cache();
+
+      $row = $this->db->where('p.start_date <= ', today())->where('p.end_date >= ', today())->get()->row_array();
+      if (!$row) {
+        $row = $this->db->where('p.start_date <= ', today())->order_by('p.start_date DESC')->get()->row_array();
+      }
+
+      $item['sales_price'] = $row['sales_price'];
       $item['details'] = json_decode($item['details']);
+      $this->db->flush_cache();
       return $item;
     }, $list);
 
