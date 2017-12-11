@@ -696,8 +696,19 @@ class Sales extends REST_Controller {
   public function quotation_get($id = 0)
   {
     if ($id) {
-      $item = $this->db->from('HK_quotations q')->join('HK_projects p', 'q.project_id = p.id')->where('q.id', $id)->get()->row_array();
-
+      // $item = $this->db->select('qd.*, p.name proj_name')->from('HK_quotation_detail qd')->join('HK_quotations q', 'qd.quotation_id = q.id')
+      //         ->join('HK_projects p', 'q.project_id = p.id')->where('qd.id', $id)->get()->row_array();
+      // // $set = json_decode($item['set']);
+      //
+      // $sets = $this->db->where('qd_id', $id)->get('HK_quotation_sets')->result_array();
+      // foreach ($sets as $set) {
+      //
+      // }
+      //
+      // $response = [
+      //   'item' => $item,
+      // ];
+      $item = $this->db->select('q.*, p.name proj_name, p.customer_id')->from('HK_quotations q')->join('HK_projects p', 'q.project_id = p.id')->where('q.id', $id)->get()->row_array();
       $response = [
         'item' => $item,
       ];
@@ -900,15 +911,100 @@ class Sales extends REST_Controller {
   public function quotation_detail_post()
   {
     $data = $this->post();
+
+      // var_dump($data['set']);
+      // return;
+    $sets = $data['set'];
     $data['set'] = json_encode($data['set'], JSON_UNESCAPED_UNICODE);
     $this->db->insert('HK_quotation_detail', $data);
-    $new_id = $this->db->insert_id();
+    $qd_id = $this->db->insert_id();
+    $this->db->set(['total' => $data['total'], 'quotation_detail_id' => $qd_id])->where('id', $data['quotation_id'])->update('HK_quotations');
 
-    $this->db->set('total', $data['total'])->where('id', $data['quotation_id'])->update('HK_quotations');
+    // loop insert
+    $index = 0;
+    foreach ($sets as $set) {
+      $set_data = [
+        'qd_id' => $qd_id,
+        'index' => $index
+      ];
+      $this->db->insert('HK_quotation_sets', $set_data);
+      $qs_id = $this->db->insert_id();
+
+      foreach ($set as $key => $com) {
+        $type = substr($key, 0, -1);
+        $com_data = [
+          'qs_id' => $qs_id,
+          'index' => $index,
+          'type' => $type,
+          'total' => $com['total'],
+          'rest' => $com['rest'],
+          'total_final' => $com['total_final']
+        ];
+
+        if (count($com['list'])) {
+          $this->db->insert('HK_quotation_set_components', $com_data);
+          $qsc_id = $this->db->insert_id();
+
+          foreach ($com['list'] as $list) {
+            $list_data = [
+              'qsc_id' => $qsc_id,
+              'type' => $type,
+              'rel_id' => $list[$type . '_id'],
+              'size' => $list['area'],
+              'qty' => $list['qty'],
+              'dc_rate' => $list['dc_rate'],
+              'total' => $list['total'],
+              'total_dc' => $list['total_dc'],
+              'sales_price' => $list['sales_price'],
+              'sales_price_dc' => $list['sales_price_dc']
+            ];
+            $this->db->insert('HK_quotation_set_component_list', $list_data);
+          }
+        }
+      }
+      $index++;
+    }
 
     activity_log();
-    if ($new_id) $this->response(NULL, REST_Controller::HTTP_CREATED);
+    if ($qd_id) $this->response(NULL, REST_Controller::HTTP_CREATED);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
 
+  public function quotation_detail_get($id = 0)
+  {
+    $item = $this->db->select('qd.*, p.name proj_name')->from('HK_quotation_detail qd')->join('HK_quotations q', 'qd.quotation_id = q.id')
+            ->join('HK_projects p', 'q.project_id = p.id')->where('qd.id', $id)->get()->row_array();
+
+    $sets = $this->db->where('qd_id', $id)->get('HK_quotation_sets')->result_array();
+    $tmp = [];
+    $index = 0;
+    foreach ($sets as $set) {
+      $coms = $this->db->where('qs_id', $set['id'])->where('index', $set['index'])->get('HK_quotation_set_components')->result_array();
+
+      foreach ($coms as $com) {
+        $lists = $this->db->where('qsc_id', $com['id'])->get('HK_quotation_set_component_list')->result_array();
+        $tmp[$index][$com['type']] = $com;
+        $tmp[$index][$com['type']]['list'] = $lists;
+
+        $j = 0;
+        foreach ($lists as $list) {
+          $rel = $this->db->where('id', $list['rel_id'])->get("HK_{$list['type']}s")->row_array();
+          if (isset($rel['details'])) {
+            $rel['details'] = json_decode($rel['details']);
+          }
+          $tmp[$index][$com['type']]['list'][$j]['rel'] = $rel;
+          $j++;
+        }
+      }
+
+      $index++;
+    }
+    $item['set'] = $tmp;
+
+    $response = [
+      'item' => $item,
+    ];
+
+    $this->response($response, REST_Controller::HTTP_OK);
+  }
 }

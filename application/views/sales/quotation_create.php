@@ -7,10 +7,6 @@
       <label class="col-sm-2 control-label">프로젝트</label>
       <div class="col-sm-4">
         <span class="form-control">{{ item.name }}</span>
-        <!-- <select class="form-control" v-model="indexProject" @change="selectProject()">
-          <option value="">선택하세요.</option>
-          <option v-for="(item, index) in projects" :value="index">{{ item.name }}</option>
-        </select> -->
       </div>
     </div>
     <div class="form-group">
@@ -36,13 +32,13 @@
     <div class="form-group">
       <label class="col-sm-2 control-label">해광 통화</label>
       <div class="col-sm-4">
-        <input type="number" class="form-control">
+        <input type="number" class="form-control" v-model="data.hk_currency">
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-2 control-label">견적 적용 환율</label>
       <div class="col-sm-4">
-        <input type="number" class="form-control">
+        <input type="number" class="form-control" v-model="data.applied_exchange">
       </div>
     </div>
   </div>

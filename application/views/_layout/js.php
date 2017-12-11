@@ -8,8 +8,12 @@
 <script src="/node_modules/moment/min/moment.min.js"></script>
 <script src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/node_modules/vue-bootstrap-datetimepicker/dist/vue-bootstrap-datetimepicker.min.js"></script>
-
 <script src="/bower_components/chart.js/dist/Chart.min.js"></script>
+
+
+<script src="/assets/js/html2canvas.min.js"></script>
+<script src="/assets/js/jspdf.min.js"></script>
+<!-- <script src="/assets/js/pdf.worker.js"></script> -->
 <script>
 Vue.component('paginate', VuejsPaginate);
 Vue.component('date-picker', VueBootstrapDatetimePicker.default);

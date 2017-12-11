@@ -2,327 +2,313 @@
   <input id="id" type="hidden" value="<?=$id?>">
   <div class="title">견적서</div>
 
-  <div>프로젝트 선택</div>
-
-  <div class="form-horizontal">
-    <div class="form-group">
-      <label class="col-sm-2 form-control-static">적용 통화</label>
-      <div class="col-sm-10">
-        <label class="radio-inline">
-          <input type="radio" value="kwn" v-model="data.currency"> 대한민국(원)
-        </label>
-        <label class="radio-inline">
-          <input type="radio" value="cny" v-model="data.currency"> 중국 CNY
-        </label>
-        <label class="radio-inline">
-          <input type="radio" value="jpy" v-model="data.currency"> 일본 JPY
-        </label>
-        <label class="radio-inline">
-          <input type="radio" value="usd" v-model="data.currency"> 미국 USD
-        </label>
-        <label class="radio-inline">
-          <input type="radio" value="eur" v-model="data.currency"> 유로 EUR
-        </label>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-sm-2 form-control-static">해광 통화</label>
-      <div class="col-sm-4">
-        <input type="number" class="form-control">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-sm-2 form-control-static">견적 적용 환율</label>
-      <div class="col-sm-4">
-        <input type="number" class="form-control">
-      </div>
-    </div>
+  <div class="text-right">
+    <button class="btn btn-success btn-sm" @click="download()">PDF 다운로드</button>
   </div>
 
-  <div>
-    <div class="form-group">
-      <label></label>
-      <input type="text" class="form-control" v-model="data.desc">
-    </div>
-  </div>
-  <div class="form-horizontal">
-    <div class="form-group">
-      <label class="col-sm-2 form-control-static">Product</label>
-      <div class="col-sm-4">
-        <select class="form-control" v-model="indexProduct" @change="selectProduct()">
-          <option value="">선택하세요.</option>
-          <option v-for="(item, index) in products" :value="index">{{ item.model }}</option>
-        </select>
+  <div id="pdf-contents">
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">적용 통화</label>
+        <div class="col-sm-10 form-control-static">
+          {{ item.currency | currency }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">해광 통화</label>
+        <div class="col-sm-10 form-control-static">
+          {{ item.hk_currency }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">견적 적용 환율</label>
+        <div class="col-sm-10 form-control-static">
+          {{ item.applied_exchange }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">설명</label>
+        <div class="col-sm-10 form-control-static">
+          {{ item.desc }}
+        </div>
       </div>
     </div>
-  </div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>Model</th>
-        <th>Type</th>
-        <th>Dimension</th>
-        <th>Concentrated Load 2mm delfection @ 1/2 edge</th>
-        <th>Ultimate Load @ 1/2 edge</th>
-        <th>Open Ratio(%)</th>
-        <th>Conductivity</th>
-        <th width="80">Q'ty</th>
-        <th width="80">Unit</th>
-        <th width="120">Unit Price</th>
-        <th width="120">Extensions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-if="selectedProduct">
-        <td>{{ selectedProduct.model }}</td>
-        <td>{{ selectedProduct.type | product_type }}</td>
-        <td>{{ selectedProduct.size }}</td>
-        <td>{{ selectedProduct.edge_cl }}</td>
-        <td>{{ selectedProduct.edge_ul }}</td>
-        <td>{{ selectedProduct.ph_ratio }}</td>
-        <td></td>
-        <td><input type="number" class="form-control" v-model="data.product.qty"></td>
-        <td><input type="text" class="form-control" v-model="data.product.unit"></td>
-        <td><input type="text" class="form-control" v-model="data.product.unit_price"></td>
-        <td><input type="text" class="form-control" v-model="data.product.ext"></td>
-      </tr>
-    </tbody>
-  </table>
 
-  <div class="form-horizontal">
-    <div class="form-group">
-      <label class="col-sm-2 form-control-static">Option</label>
-      <div class="col-sm-4">
-        <select class="form-control" v-model="indexOption" @change="selectOption()">
-          <option value="">선택하세요.</option>
-          <option v-for="(item, index) in options" :value="index">{{ item.name }}</option>
-        </select>
+    <div v-for="(set, index) in item.set">
+      <div v-show="set.product">
+        <br>
+        <h4>제품</h4>
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Type</th>
+              <th>Dimension</th>
+              <th>Concentrated Load 2mm delfection @ 1/2 edge</th>
+              <th>Ultimate Load @ 1/2 edge</th>
+              <th>Open Ratio(%)</th>
+              <th>Conductivity</th>
+              <th width="100">면적</th>
+              <th width="100">수량</th>
+              <th width="150">단가</th>
+              <th width="150">금액</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="com in set.product.list">
+              <td>{{ com.rel.model }}</td>
+              <td>{{ com.rel.type | product_type }}</td>
+              <td>{{ com.rel.size }}</td>
+              <td>{{ com.rel.edge_cl }}</td>
+              <td>{{ com.rel.edge_ul }}</td>
+              <td>{{ com.rel.ph_ratio }}</td>
+              <td>{{ com.rel.conductivity }}</td>
+              <td>{{ com.size }}</td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.qty }}</div>
+                <div>할인률 {{ com.dc_rate }}%</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
+                <div>{{ com.sales_price_dc | number }}원</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.total | number }}원</div>
+                <div>{{ com.total_dc | number }}원</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="10">합계</td>
+              <td>{{ set.product.total | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">절사</td>
+              <td>{{ set.product.rest | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">최종 합계</td>
+              <td>{{ set.product.total_final | number }}원</div>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-  </div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>옵션명</th>
-        <th>옵션상세</th>
-        <th width="80">Q'ty</th>
-        <th width="80">Unit</th>
-        <th width="120">Unit Price</th>
-        <th width="120">Extensions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-if="selectedOption">
-        <td>{{ selectedOption.name }}</td>
-        <td class="outer-td">
-          <div class="clearfix">
-            <div class="pull-left inner-td" v-for="(v, k) in selectedOption.details" v-bind:style="{width: 100 / Object.keys(selectedOption.details).length + '%'}">
-              <div>{{ k }}</div>
-              <div>{{ v }}</div>
-            </div>
-          </div>
-        </td>
-        <td><input type="number" class="form-control" v-model="data.option.qty"></td>
-        <td><input type="text" class="form-control" v-model="data.option.unit"></td>
-        <td><input type="text" class="form-control" v-model="data.option.unit_price"></td>
-        <td><input type="text" class="form-control" v-model="data.option.ext"></td>
-      </tr>
-    </tbody>
-  </table>
 
-  <div class="form-horizontal">
-    <div class="form-group">
-      <label class="col-sm-2 form-control-static">Sub-material</label>
-      <div class="col-sm-4">
-        <select class="form-control" v-model="indexMaterial" @change="selectMaterial()">
-          <option value="">선택하세요.</option>
-          <option v-for="(item, index) in materials" :value="index">{{ item.name }}</option>
-        </select>
+      <div v-if="set.option">
+        <br>
+        <h4>옵션</h4>
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>옵션명</th>
+              <th>옵션상세</th>
+              <th width="100">수량</th>
+              <th width="150">단가</th>
+              <th width="150">금액</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="com in set.option.list">
+              <td>{{ com.rel.name }}</td>
+              <td class="outer-td">
+                <div class="clearfix">
+                  <div class="pull-left inner-td" v-for="(v, k) in com.rel.details" v-bind:style="{width: 100 / Object.keys(com.rel.details).length + '%'}">
+                    <div>{{ k }}</div>
+                    <div>{{ v ? v : '&nbsp;' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.qty }}</div>
+                <div>할인률 {{ com.dc_rate }}%</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
+                <div>{{ com.sales_price_dc | number }}원</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.total | number }}원</div>
+                <div>{{ com.total_dc | number }}원</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="10">합계</td>
+              <td>{{ set.option.total | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">절사</td>
+              <td>{{ set.option.rest | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">최종 합계</td>
+              <td>{{ set.option.total_final | number }}원</div>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-  </div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>부자재명</th>
-        <th>부자재상세</th>
-        <th width="80">Q'ty</th>
-        <th width="80">Unit</th>
-        <th width="120">Unit Price</th>
-        <th width="120">Extensions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-if="selectedMaterial">
-        <td>{{ selectedMaterial.name }}</td>
-        <td class="outer-td">
-          <div class="clearfix">
-            <div class="pull-left inner-td" v-for="(v, k) in selectedMaterial.details" v-bind:style="{width: 100 / Object.keys(selectedMaterial.details).length + '%'}">
-              <div>{{ k }}</div>
-              <div>{{ v }}</div>
-            </div>
-          </div>
-        </td>
-        <td><input type="number" class="form-control" v-model="data.material.qty"></td>
-        <td><input type="text" class="form-control" v-model="data.material.unit"></td>
-        <td><input type="text" class="form-control" v-model="data.material.unit_price"></td>
-        <td><input type="text" class="form-control" v-model="data.material.ext"></td>
-      </tr>
-    </tbody>
-  </table>
 
-  <div class="form-horizontal">
-    <div class="form-group">
-      <label class="col-sm-2 form-control-static">Indirect Cost</label>
-      <div class="col-sm-4">
-        <select class="form-control" v-model="indexCost" @change="selectCost()">
-          <option value="">선택하세요.</option>
-          <option v-for="(item, index) in costs" :value="index">{{ item.name }}</option>
-        </select>
+      <div v-if="set.material">
+        <br>
+        <h4>부자재</h4>
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>부자재명</th>
+              <th>부자재상세</th>
+              <th width="100">수량</th>
+              <th width="150">단가</th>
+              <th width="150">금액</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="com in set.material.list">
+              <td>{{ com.rel.name }}</td>
+              <td class="outer-td">
+                <div class="clearfix">
+                  <div class="pull-left inner-td" v-for="(v, k) in com.rel.details" v-bind:style="{width: 100 / Object.keys(com.rel.details).length + '%'}">
+                    <div>{{ k }}</div>
+                    <div>{{ v ? v : '&nbsp;' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.qty }}</div>
+                <div>할인률 {{ com.dc_rate }}%</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
+                <div>{{ com.sales_price_dc | number }}원</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.total | number }}원</div>
+                <div>{{ com.total_dc | number }}원</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="10">합계</td>
+              <td>{{ set.material.total | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">절사</td>
+              <td>{{ set.material.rest | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">최종 합계</td>
+              <td>{{ set.material.total_final | number }}원</div>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-  </div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>간접비명</th>
-        <th>간접비상세</th>
-        <th width="80">Q'ty</th>
-        <th width="80">Unit</th>
-        <th width="120">Unit Price</th>
-        <th width="120">Extensions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-if="selectedCost">
-        <td>{{ selectedCost.name }}</td>
-        <td class="outer-td">
-          <div class="clearfix">
-            <div class="pull-left inner-td" v-for="(v, k) in selectedCost.details" v-bind:style="{width: 100 / Object.keys(selectedCost.details).length + '%'}">
-              <div>{{ k }}</div>
-              <div>{{ v }}</div>
-            </div>
-          </div>
-        </td>
-        <td><input type="number" class="form-control" v-model="data.cost.qty"></td>
-        <td><input type="text" class="form-control" v-model="data.cost.unit"></td>
-        <td><input type="text" class="form-control" v-model="data.cost.unit_price"></td>
-        <td><input type="text" class="form-control" v-model="data.cost.ext"></td>
-      </tr>
-    </tbody>
-  </table>
 
-  <div clss="margin-top-1">
-    <button class="btn btn-primary" @click="save()">저장</button>
+      <div v-if="set.cost">
+        <br>
+        <h4>간접비</h4>
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>간접비명</th>
+              <th>간접비상세</th>
+              <th width="100">수량</th>
+              <th width="150">단가</th>
+              <th width="150">금액</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="com in set.cost.list">
+              <td>{{ com.rel.name }}</td>
+              <td class="outer-td">
+                <div class="clearfix">
+                  <div class="pull-left inner-td" v-for="(v, k) in com.rel.details" v-bind:style="{width: 100 / Object.keys(com.rel.details).length + '%'}">
+                    <div>{{ k }}</div>
+                    <div>{{ v ? v : '&nbsp;' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.qty }}</div>
+                <div>할인률 {{ com.dc_rate }}%</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
+                <div>{{ com.sales_price_dc | number }}원</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 5px;">{{ com.total | number }}원</div>
+                <div>{{ com.total_dc | number }}원</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="10">합계</td>
+              <td>{{ set.cost.total | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">절사</td>
+              <td>{{ set.cost.rest | number }}원</div>
+            </tr>
+            <tr>
+              <td colspan="10">최종 합계</td>
+              <td>{{ set.cost.total_final | number }}원</div>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- v-for -->
+  </div><!-- #pdf-contents -->
+  <div class="text-center margin-top-2">
+    <button class="btn btn-primary" onclick="history.go(-1)">목록</button>
   </div>
 </div>
 
 <script>
+Vue.filter('currency', function (value) {
+  var list = {
+    'kwn': '대한민국(원)',
+    'cny': '중국 CNY',
+    'jpy': '일본 JPY',
+    'usd': '미국 USD',
+    'eur': '유로 EUR',
+  };
+
+  return list[value] ? list[value] : '';
+});
 var vm = new Vue({
   el: '#sales-quotation',
   data: {
     id: $('#id').val(),
-    data: {
-      product: {},
-      option: {},
-      material: {},
-      cost: {},
-    },
-    products: [],
-    options: [],
-    materials: [],
-    costs: [],
-    indexProduct: '',
-    indexOption: '',
-    indexMaterial: '',
-    indexCost: '',
-    selectedProduct: undefined,
-    selectedOption: undefined,
-    selectedMaterial: undefined,
-    selectedCost: undefined,
-    selectedOptions: [],
-    selectedMaterials: [],
-    selectedCosts: [],
+    item: {},
+  },
+  mounted: function () {
+    this.$nextTick(function () {
+      vm.init();
+    });
   },
   methods: {
     init: function () {
-      vm.data.id = vm.id;
       vm.reload();
     },
     reload: function () {
       vm.getItem();
-      vm.getProducts();
-      vm.getOptions();
-      vm.getMaterials();
-      vm.getCosts();
     },
-    selectProduct: function () {
-      vm.selectedProduct = vm.products[vm.indexProduct];
-      vm.data.product.type_id = vm.selectedProduct.id;
-    },
-    selectOption: function () {
-      vm.selectedOption = vm.options[vm.indexOption];
-      vm.data.option.type_id = vm.selectedOption.id;
-    },
-    selectMaterial: function () {
-      vm.selectedMaterial = vm.materials[vm.indexMaterial];
-      vm.data.material.type_id = vm.selectedMaterial.id;
-    },
-    selectCost: function () {
-      vm.selectedCost = vm.costs[vm.indexCost];
-      vm.data.cost.type_id = vm.selectedCost.id;
+    download: function () {
+      var doc = new jsPDF();
+      var el = document.getElementById("pdf-contents");
+      html2canvas(el, {
+        onrendered : function (canvas) {
+          var imgData = canvas.toDataURL('image/png');
+          vm.pdf = imgData;
+          var doc = new jsPDF('p','mm',[297,210]);
+          // doc.addImage(imgData, 'PNG', 10,10,el.offsetWidth/10,el.offsetHeight/10);
+          doc.addImage(imgData, 'PNG', 10,10,190,el.offsetHeight/(el.offsetWidth/190));
+          doc.save('개인지출내역서.pdf');
+        }
+      });
     },
     getItem: function () {
-      axios.get('/api/sales/quotation/' + vm.id).then(function (response) {
+      axios.get('/api/sales/quotation_detail/' + vm.id).then(function (response) {
         if (response.status == 200) {
           vm.item = response.data.item;
-          vm.selectedProduct = response.data.selected.product;
-          vm.selectedOption = response.data.selected.option;
-          vm.selectedMaterial = response.data.selected.material;
-          vm.selectedCost = response.data.selected.cost;
-          vm.data.product = response.data.data.product ? response.data.data.product : {};
-          vm.data.option = response.data.data.option ? response.data.data.option : {};
-          vm.data.material = response.data.data.material ? response.data.data.material : {};
-          vm.data.cost = response.data.data.cost ? response.data.data.cost : {};
-        }
-      });
-    },
-    getProducts: function () {
-      axios.get('/api/sales/quotation_products').then(function (response) {
-        if (response.status == 200) {
-          vm.products = response.data.list;
-        }
-      });
-    },
-    getOptions: function () {
-      axios.get('/api/sales/quotation_options').then(function (response) {
-        if (response.status == 200) {
-          vm.options = response.data.list;
-        }
-      });
-    },
-    getMaterials: function () {
-      axios.get('/api/sales/quotation_materials').then(function (response) {
-        if (response.status == 200) {
-          vm.materials = response.data.list;
-        }
-      });
-    },
-    getCosts: function () {
-      axios.get('/api/sales/quotation_costs').then(function (response) {
-        if (response.status == 200) {
-          vm.costs = response.data.list;
-        }
-      });
-    },
-    save: function () {
-      axios.put('/api/sales/quotation_detail', vm.data).then(function (response) {
-        if (response.status == 200) {
-          alert('저장되었습니다.');
         }
       });
     },
   }
 });
-vm.init();
 </script>
