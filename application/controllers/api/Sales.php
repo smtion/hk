@@ -916,6 +916,7 @@ class Sales extends REST_Controller {
       // return;
     $sets = $data['set'];
     $data['set'] = json_encode($data['set'], JSON_UNESCAPED_UNICODE);
+    $data['user_id'] = get_user_id();
     $this->db->insert('HK_quotation_detail', $data);
     $qd_id = $this->db->insert_id();
     $this->db->set(['total' => $data['total'], 'quotation_detail_id' => $qd_id])->where('id', $data['quotation_id'])->update('HK_quotations');
@@ -972,7 +973,7 @@ class Sales extends REST_Controller {
 
   public function quotation_detail_get($id = 0)
   {
-    $item = $this->db->select('qd.*, p.name proj_name')->from('HK_quotation_detail qd')->join('HK_quotations q', 'qd.quotation_id = q.id')
+    $item = $this->db->select('qd.*, q.*, p.name proj_name, p.customer_id')->from('HK_quotation_detail qd')->join('HK_quotations q', 'qd.quotation_id = q.id')
             ->join('HK_projects p', 'q.project_id = p.id')->where('qd.id', $id)->get()->row_array();
 
     $sets = $this->db->where('qd_id', $id)->get('HK_quotation_sets')->result_array();
@@ -1001,9 +1002,51 @@ class Sales extends REST_Controller {
     }
     $item['set'] = $tmp;
 
+    $project = $this->db->where('id', $item['project_id'])->get('HK_projects')->row_array();
+    $company = $this->db->get('HK_company_info')->row_array();
+    $customer = $this->db->where('id', $item['customer_id'])->get('HK_customers')->row_array();
+    $user = $this->db->where('id', $item['user_id'])->get('HK_users')->row_array();
+
     $response = [
       'item' => $item,
+      'project' => $project,
+      'company' => $company,
+      'customer' => $customer,
+      'user' => $user,
     ];
+
+    $this->response($response, REST_Controller::HTTP_OK);
+  }
+
+  public function quotation_upload_post($id = 0)
+  {
+    $data = $this->post();
+    var_dump($data);
+    var_dump($_FILES);
+    $config['upload_path']          = './uploads/';
+    $config['allowed_types']        = '*';
+    $config['max_size']             = 1000000000;
+    $config['max_width']            = 1024;
+    $config['max_height']           = 768;
+
+    $this->load->library('upload', $config);
+    var_dump($this->upload->data());
+
+    if ( ! $this->upload->do_upload('file'))
+               {
+                       $error = array('error' => $this->upload->display_errors());
+                      echo 'error';
+                       // var_dump($this->upload->data());
+                       // $this->load->view('upload_form', $error);
+               }
+               else
+               {
+                       $data = array('upload_data' => $this->upload->data());
+
+                       var_dump($this->upload->data());
+                       // $this->load->view('upload_success', $data);
+               }
+
 
     $this->response($response, REST_Controller::HTTP_OK);
   }

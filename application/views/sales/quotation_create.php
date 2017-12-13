@@ -6,7 +6,7 @@
     <div class="form-group">
       <label class="col-sm-2 control-label">프로젝트</label>
       <div class="col-sm-4">
-        <span class="form-control">{{ item.name }}</span>
+        <span class="form-control">{{ item.proj_name }}</span>
       </div>
     </div>
     <div class="form-group">
@@ -455,7 +455,7 @@ var vm = new Vue({
         total: 0,
         total_dc: 0,
         sales_price_dc: vm.products[vm.indexProduct[index]]['sales_price'],
-        dc_rate: '',
+        dc_rate: 0,
       });
     },
     selectOption: function (index) {
@@ -467,7 +467,7 @@ var vm = new Vue({
         total: 0,
         total_dc: 0,
         sales_price_dc: vm.options[vm.indexOption[index]]['sales_price'],
-        dc_rate: '',
+        dc_rate: 0,
       });
     },
     selectMaterial: function (index) {
@@ -479,7 +479,7 @@ var vm = new Vue({
         total: 0,
         total_dc: 0,
         sales_price_dc: vm.materials[vm.indexMaterial[index]]['sales_price'],
-        dc_rate: '',
+        dc_rate: 0,
       });
     },
     selectCost: function (index) {
@@ -491,13 +491,13 @@ var vm = new Vue({
         total: 0,
         total_dc: 0,
         sales_price_dc: vm.costs[vm.indexCost[index]]['sales_price'],
-        dc_rate: '',
+        dc_rate: 0,
       });
     },
     calulate: function (type, i, j) {
       var item = vm.data.set[i][type]['list'][j];
       item.total = item.qty * item.sales_price;
-      item.sales_price_dc = item.sales_price * (100 - item.dc_rate) / 100;
+      item.sales_price_dc = item.sales_price * (100 + item.dc_rate * 1) / 100;
       item.total_dc = item.qty * item.sales_price_dc;
 
       vm.data.set[i][type]['total'] = 0;
@@ -563,6 +563,19 @@ var vm = new Vue({
       });
     },
     save: function () {
+      if (!vm.data.currency) {
+        alert('적용 통화를 선택하세요.');
+        return;
+      }
+      if (!vm.data.hk_currency) {
+        alert('해광 통화를 선택하세요.');
+        return;
+      }
+      if (!vm.data.applied_exchange) {
+        alert('견적 적용 환율을 선택하세요.');
+        return;
+      }
+
       vm.data.total = 0;
       vm.data.set.forEach(function (set) {
         vm.data.total += (set.products.total_final + set.options.total_final + set.materials.total_final + set.costs.total_final);

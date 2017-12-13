@@ -19,7 +19,7 @@
         <th>총금액</th>
         <th>승인</th>
         <th>보기</th>
-        <th>다운로드</th>
+        <!-- <th>다운로드</th> -->
         <th>견적상세등록</th>
       </tr>
     </thead>
@@ -35,7 +35,7 @@
         <td>{{ item.total | number }}</td>
         <td></td>
         <td><a class="btn btn-default btn-sm" :href="'/sales/quotation/' + item.quotation_detail_id" v-if="item.quotation_detail_id">보기</a></td>
-        <td></td>
+        <!-- <td></td> -->
         <td><a class="btn btn-default btn-sm" :href="'/sales/quotation_create/' + item.id">추가</a></td>
       </tr>
     </tbody>

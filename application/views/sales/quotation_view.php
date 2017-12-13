@@ -5,34 +5,97 @@
   <div class="text-right">
     <button class="btn btn-success btn-sm" @click="download()">PDF 다운로드</button>
   </div>
+  <br>
 
   <div id="pdf-contents">
-    <div class="form-horizontal">
-      <div class="form-group">
-        <label class="col-sm-2 control-label">적용 통화</label>
-        <div class="col-sm-10 form-control-static">
-          {{ item.currency | currency }}
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="col-sm-2 control-label">해광 통화</label>
-        <div class="col-sm-10 form-control-static">
-          {{ item.hk_currency }}
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="col-sm-2 control-label">견적 적용 환율</label>
-        <div class="col-sm-10 form-control-static">
-          {{ item.applied_exchange }}
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="col-sm-2 control-label">설명</label>
-        <div class="col-sm-10 form-control-static">
-          {{ item.desc }}
-        </div>
-      </div>
-    </div>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th colspan="2" class="td-left">수신자</th>
+          <th colspan="2" class="td-left">공급자</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>회사명</th>
+          <td>{{ customer.corp_name }}</td>
+          <th>회사명</th>
+          <td>{{ company.corp_name }}</td>
+        </tr>
+        <tr>
+          <th>담당자</th>
+          <td>{{ customer.corp_name }}</td>
+          <th>대표자</th>
+          <td>{{ company.corp_name }}</td>
+        </tr>
+        <tr>
+          <th>전화번호</th>
+          <td>{{ customer.tel }}</td>
+          <th>사업자등록번호</th>
+          <td>{{ company.reg_no }}</td>
+        </tr>
+        <tr>
+          <th>이메일주소</th>
+          <td>{{ customer.email }}</td>
+          <th>담당자</th>
+          <td>{{ user.name }}</td>
+        </tr>
+        <tr>
+          <th></th>
+          <td></td>
+          <th>담당자 연락처</th>
+          <td>{{ user.phone }}</td>
+        </tr>
+        <tr>
+          <th></th>
+          <td></td>
+          <th>담당자 이메일</th>
+          <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+          <td colspan="4"></td>
+        </tr>
+        <tr>
+          <th>견적번호</th>
+          <td>{{ item.code }}</td>
+          <th>Payment Term</th>
+          <td>{{ item.payment_term }}일</td>
+        </tr>
+        <tr>
+          <th>프로젝트 이름</th>
+          <td>{{ item.proj_name }}</td>
+          <th>견적서 유효기간</th>
+          <td>발행 후 {{ item.expiry_day }}일</td>
+        </tr>
+        <tr>
+          <th>견적서 발행일</th>
+          <td>{{ item.publish_date }}</td>
+          <th>적용 통화</th>
+          <td>{{ item.currency | currency }}</td>
+        </tr>
+        <tr>
+          <th>배송 납품기일</th>
+          <td>{{ item.delivery_term }}일</td>
+          <th>공사 이름</th>
+          <td>{{ item.construct_name }}</td>
+        </tr>
+        <!-- <tr>
+          <th>첨부 견적서</th>
+          <td colspan="3">
+            <form name="frm" enctype="multipart/form-data" @submit.prevent>
+              <div class="row">
+                <div class="col-sm-8">
+                  <input type="file" class="form-control" @change="selectFile($event.target.files)">
+                </div>
+                <div class="col-sm-4 text-left">
+                  <button class="btn btn-success btn-sm" @click="upload()" >업로드</button>
+                </div>
+              </div>
+            </form>
+          </td>
+        </tr> -->
+      </tbody>
+    </table>
 
     <div v-for="(set, index) in item.set">
       <div v-show="set.product">
@@ -66,7 +129,7 @@
               <td>{{ com.size }}</td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.qty }}</div>
-                <div>할인률 {{ com.dc_rate }}%</div>
+                <div>{{ com.dc_rate }}%</div>
               </td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
@@ -119,7 +182,7 @@
               </td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.qty }}</div>
-                <div>할인률 {{ com.dc_rate }}%</div>
+                <div>{{ com.dc_rate }}%</div>
               </td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
@@ -172,7 +235,7 @@
               </td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.qty }}</div>
-                <div>할인률 {{ com.dc_rate }}%</div>
+                <div>{{ com.dc_rate }}%</div>
               </td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
@@ -225,7 +288,7 @@
               </td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.qty }}</div>
-                <div>할인률 {{ com.dc_rate }}%</div>
+                <div>{{ com.dc_rate }}%</div>
               </td>
               <td>
                 <div style="margin-bottom: 5px;">{{ com.sales_price | number }}원</div>
@@ -275,6 +338,11 @@ var vm = new Vue({
   data: {
     id: $('#id').val(),
     item: {},
+    company: {},
+    customer: {},
+    user: {},
+    data: {},
+    formData: {},
   },
   mounted: function () {
     this.$nextTick(function () {
@@ -298,14 +366,36 @@ var vm = new Vue({
           var doc = new jsPDF('p','mm',[297,210]);
           // doc.addImage(imgData, 'PNG', 10,10,el.offsetWidth/10,el.offsetHeight/10);
           doc.addImage(imgData, 'PNG', 10,10,190,el.offsetHeight/(el.offsetWidth/190));
-          doc.save('개인지출내역서.pdf');
+          doc.save(vm.item.proj_name + '_견적서.pdf');
         }
+      });
+    },
+    selectFile: function (file) {
+      // console.log(file[0]);
+      if (!file.length) return;
+// vm.data.file = file[0];
+      vm.formData = new FormData();
+      vm.formData.append('file', file[0], file[0].name);
+      console.log(vm.formData);
+    },
+    upload: function () {
+      axios.post('/api/sales/quotation_upload/' + vm.id, vm.formData
+      // , {
+   // headers: {
+   //     'Content-Type': 'multipart/form-data'
+   // }
+// }
+).then(function (response) {
+        console.log(response);
       });
     },
     getItem: function () {
       axios.get('/api/sales/quotation_detail/' + vm.id).then(function (response) {
         if (response.status == 200) {
           vm.item = response.data.item;
+          vm.company = response.data.company;
+          vm.customer = response.data.customer;
+          vm.user = response.data.user;
         }
       });
     },
