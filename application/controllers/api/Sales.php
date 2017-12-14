@@ -1006,6 +1006,7 @@ class Sales extends REST_Controller {
     $company = $this->db->get('HK_company_info')->row_array();
     $customer = $this->db->where('id', $item['customer_id'])->get('HK_customers')->row_array();
     $user = $this->db->where('id', $item['user_id'])->get('HK_users')->row_array();
+    $files = $this->db->where('qd_id', $id)->get('HK_quotation_attachments')->result_array();
 
     $response = [
       'item' => $item,
@@ -1013,41 +1014,49 @@ class Sales extends REST_Controller {
       'company' => $company,
       'customer' => $customer,
       'user' => $user,
+      'files' => $files,
     ];
 
+    activity_log();
     $this->response($response, REST_Controller::HTTP_OK);
   }
 
-  public function quotation_upload_post($id = 0)
+  public function quotation_attachment_post($id = 0)
   {
-    $data = $this->post();
-    var_dump($data);
-    var_dump($_FILES);
-    $config['upload_path']          = './uploads/';
-    $config['allowed_types']        = '*';
-    $config['max_size']             = 1000000000;
-    $config['max_width']            = 1024;
-    $config['max_height']           = 768;
-
+    $config = [
+      'upload_path' => './uploads/',
+      'allowed_types' => '*',
+      'max_size' => 1024 * 1024 * 10
+    ];
     $this->load->library('upload', $config);
-    var_dump($this->upload->data());
 
-    if ( ! $this->upload->do_upload('file'))
-               {
-                       $error = array('error' => $this->upload->display_errors());
-                      echo 'error';
-                       // var_dump($this->upload->data());
-                       // $this->load->view('upload_form', $error);
-               }
-               else
-               {
-                       $data = array('upload_data' => $this->upload->data());
+    if (!$this->upload->do_upload('file')) {
+      $error = array('error' => $this->upload->display_errors());
 
-                       var_dump($this->upload->data());
-                       // $this->load->view('upload_success', $data);
-               }
+      $response = [
+        'msg' => $this->upload->display_errors(),
+      ];
+      activity_log();
+      $this->response($response, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+    } else {
+      $data = array('upload_data' => $this->upload->data());
+      $this->db->insert('HK_quotation_attachments', ['qd_id' => $id, 'file' => '/uploads/' . $data['upload_data']['file_name']]);
+      $files = $this->db->where('qd_id', $id)->get('HK_quotation_attachments')->result_array();
 
+      $response = [
+        'files' => $files,
+      ];
+      activity_log();
+      $this->response($response, REST_Controller::HTTP_CREATED);
+    }
+  }
 
-    $this->response($response, REST_Controller::HTTP_OK);
+  public function quotation_attachment_delete($id = 0)
+  {
+    $result = $this->db->where('id', $id)->delete('HK_quotation_attachments');
+
+    activity_log();
+    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
+    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
   }
 }

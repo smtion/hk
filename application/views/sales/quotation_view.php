@@ -79,21 +79,26 @@
           <th>공사 이름</th>
           <td>{{ item.construct_name }}</td>
         </tr>
-        <!-- <tr>
+        <tr>
           <th>첨부 견적서</th>
           <td colspan="3">
             <form name="frm" enctype="multipart/form-data" @submit.prevent>
               <div class="row">
                 <div class="col-sm-8">
-                  <input type="file" class="form-control" @change="selectFile($event.target.files)">
+                  <input id="file" type="file" class="form-control" @change="selectFile($event.target.files)">
                 </div>
                 <div class="col-sm-4 text-left">
-                  <button class="btn btn-success btn-sm" @click="upload()" >업로드</button>
+                  <button class="btn btn-success btn-sm" @click="uploadFile()" :disabled="!formData">업로드</button>
                 </div>
               </div>
             </form>
+
+            <br>
+            <div class="text-left" style="margin-top: 5px;" v-for="(file, index) in files">
+              <a style="cursor: pointer;" @click="downloadFile(file.file)">{{ file.file.substring(file.file.lastIndexOf('/')+1) }}</a> <a style="margin-left: 15px; cursor: pointer;" @click="deleteFile(index)">삭제</a>
+            </div>
           </td>
-        </tr> -->
+        </tr>
       </tbody>
     </table>
 
@@ -341,8 +346,9 @@ var vm = new Vue({
     company: {},
     customer: {},
     user: {},
+    files: [],
     data: {},
-    formData: {},
+    formData: null,
   },
   mounted: function () {
     this.$nextTick(function () {
@@ -371,22 +377,37 @@ var vm = new Vue({
       });
     },
     selectFile: function (file) {
-      // console.log(file[0]);
       if (!file.length) return;
-// vm.data.file = file[0];
       vm.formData = new FormData();
       vm.formData.append('file', file[0], file[0].name);
-      console.log(vm.formData);
     },
-    upload: function () {
-      axios.post('/api/sales/quotation_upload/' + vm.id, vm.formData
-      // , {
-   // headers: {
-   //     'Content-Type': 'multipart/form-data'
-   // }
-// }
-).then(function (response) {
-        console.log(response);
+    uploadFile: function () {
+      if (!vm.formData) {
+        return;
+      }
+
+      axios.post('/api/sales/quotation_attachment/' + vm.id, vm.formData).then(function (response) {
+        if (response.status == 201) {
+          vm.files = response.data.files;
+          $('#file').val('');
+          vm.formData = null;
+        }
+      });
+    },
+    deleteFile: function (index) {
+      axios.delete('/api/sales/quotation_attachment/' + vm.files[index]['id']).then(function (response) {
+        if (response.status == 200) {
+          vm.files.splice(index, 1);
+        }
+      });
+    },
+    downloadFile: function (url) {
+      axios.post(url, null, {responseType:'arraybuffer'}).then(function (response) {
+        var blob = new Blob([response.data], {type: response.headers['content-type']});
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = url.substring(url.lastIndexOf('/')+1);
+        link.click();
       });
     },
     getItem: function () {
@@ -396,6 +417,7 @@ var vm = new Vue({
           vm.company = response.data.company;
           vm.customer = response.data.customer;
           vm.user = response.data.user;
+          vm.files = response.data.files;
         }
       });
     },
