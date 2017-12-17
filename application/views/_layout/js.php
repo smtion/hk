@@ -10,7 +10,6 @@
 <script src="/node_modules/vue-bootstrap-datetimepicker/dist/vue-bootstrap-datetimepicker.min.js"></script>
 <script src="/bower_components/chart.js/dist/Chart.min.js"></script>
 
-
 <script src="/assets/js/html2canvas.min.js"></script>
 <script src="/assets/js/jspdf.min.js"></script>
 <!-- <script src="/assets/js/pdf.worker.js"></script> -->

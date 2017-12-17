@@ -1,33 +1,31 @@
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <!-- <a class="navbar-brand" href="/main">HK</a> -->
-    </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <? if (has_permission('sales')) : ?><li><a href="/sales">영업팀</a></li><? endif ?>
-        <? if (has_permission('purchase')) : ?><li><a href="/purchase">구매팀</a></li><? endif ?>
-        <? if (has_permission('production')) : ?><li><a href="/production">생산팀</a></li><? endif ?>
-        <? if (has_permission('finance')) : ?><li><a href="/finance">재무팀</a></li><? endif ?>
-        <? if (has_permission('admin')) : ?><li><a href="/admin">관리자</a></li><? endif ?>
-      </ul>
+<!-- top navigation -->
+<div class="top_nav">
+  <div class="nav_menu">
+    <nav>
+      <div class="nav toggle">
+        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+      </div>
+
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?=get_session_data('name') . ' (' . get_session_data('email') . ')'?> <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/mypage">마이페이지</a></li>
-            <? if (get_role() == 'admin') : ?><li><a href="#">관리자</a></li><? endif ?>
-            <li role="separator" class="divider"></li>
-            <li><a href="/auth/logout">Logout</a></li>
+        <li class="">
+          <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <img src="images/img.jpg" alt=""><?=get_user_name()?>
+            <span class=" fa fa-angle-down"></span>
+          </a>
+          <ul class="dropdown-menu dropdown-usermenu pull-right">
+            <li><a href="/mypage/info"> 내 정보 변경</a></li>
+            <!-- <li>
+              <a href="javascript:;">
+                <span class="badge bg-red pull-right">50%</span>
+                <span>Settings</span>
+              </a>
+            </li> -->
+            <li><a href="/mypage/user_list">사용자 목록</a></li>
+            <li><a href="/auth/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
           </ul>
         </li>
       </ul>
-    </div>
+    </nav>
   </div>
-</nav>
+</div>
+<!-- /top navigation -->
