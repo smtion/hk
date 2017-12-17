@@ -696,18 +696,6 @@ class Sales extends REST_Controller {
   public function quotation_get($id = 0)
   {
     if ($id) {
-      // $item = $this->db->select('qd.*, p.name proj_name')->from('HK_quotation_detail qd')->join('HK_quotations q', 'qd.quotation_id = q.id')
-      //         ->join('HK_projects p', 'q.project_id = p.id')->where('qd.id', $id)->get()->row_array();
-      // // $set = json_decode($item['set']);
-      //
-      // $sets = $this->db->where('qd_id', $id)->get('HK_quotation_sets')->result_array();
-      // foreach ($sets as $set) {
-      //
-      // }
-      //
-      // $response = [
-      //   'item' => $item,
-      // ];
       $item = $this->db->select('q.*, p.name proj_name, p.customer_id')->from('HK_quotations q')->join('HK_projects p', 'q.project_id = p.id')->where('q.id', $id)->get()->row_array();
       $response = [
         'item' => $item,
@@ -771,6 +759,15 @@ class Sales extends REST_Controller {
   {
     $data = $this->patch();
     $result = $this->db->where('id', $data['id'])->update('HK_quotations', $data);
+
+    activity_log();
+    if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
+    else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+  }
+
+  public function quotation_approve_patch($id)
+  {
+    $result = $this->db->where('id', $id)->update('HK_quotations', ['approval' => 1]);
 
     activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
@@ -1058,5 +1055,46 @@ class Sales extends REST_Controller {
     activity_log();
     if ($result) $this->response(NULL, REST_Controller::HTTP_OK);
     else $this->response(NULL, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+  }
+
+
+
+  //-----------------------------------------------------------------------
+  // PO
+  //-----------------------------------------------------------------------
+  public function po_get($id = 0)
+  {
+    if ($id) {
+      $item = $this->db->select('q.*, p.name proj_name, p.customer_id')->from('HK_quotations q')->join('HK_projects p', 'q.project_id = p.id')->where('q.id', $id)->get()->row_array();
+      $response = [
+        'item' => $item,
+      ];
+    } else {
+      $page = $this->get('page');
+      $limit = 10;
+      $offset = ($page - 1) * $limit;
+
+      $this->db->start_cache();
+      $this->db->from('HK_quotations q')->join('HK_projects p', 'q.project_id = p.id')->join('HK_customers c', 'p.customer_id = c.id')->where('q.approval = 1');
+      if (($search = $this->get('search')) && ($keyword = $this->get('keyword'))) {
+        $this->db->like($search, $keyword);
+      }
+      $this->db->stop_cache();
+
+      $total = $this->db->count_all_results();
+      $list = $this->db->select('q.*, p.name, c.corp_name, c.country')->order_by('q.id desc')->get(null, $limit, $offset)->result_array();
+
+      $response = [
+        'paginate' => [
+          'total' => $total,
+          'page' => $page,
+          'limit' => $limit
+        ],
+        'list' => $list
+      ];
+    }
+
+    activity_log();
+    $this->response($response, REST_Controller::HTTP_OK);
   }
 }

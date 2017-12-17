@@ -51,7 +51,7 @@
             </div>
           </div>
         </td>
-        <td><span class="pointer" @click="edit(index)">편집</span></td>
+        <td><button class="btn btn-default btn-sm" @click="edit(index)">편집</button></td>
       </tr>
     </tbody>
   </table>

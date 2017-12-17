@@ -81,9 +81,20 @@ class Sales extends EX_Controller {
     $this->load->view(LAYOUT, $this->cdata);
 	}
 
-  public function approval()
+  public function po()
 	{
-    $this->cdata->template = 'sales/approval';
+    $this->cdata->template = 'sales/po';
+    $this->load->view(LAYOUT, $this->cdata);
+	}
+
+  public function po_create($id = 0)
+	{
+    if (!$id) {
+      redirect('/sales/po');
+    }
+
+    $this->cdata->id = $id;
+    $this->cdata->template = 'sales/po_create';
     $this->load->view(LAYOUT, $this->cdata);
 	}
 

@@ -13,7 +13,7 @@ function get_user_id()
 
 function get_user_name()
 {
-  return get_session_data('user_name');
+  return get_session_data('name');
 }
 
 function get_role()

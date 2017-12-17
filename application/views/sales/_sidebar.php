@@ -10,6 +10,6 @@
   <a href="/sales/customer" class="list-group-item">고객 관리</a>
   <a href="/sales/project" class="list-group-item">프로젝트 관리</a>
   <a href="/sales/quotation" class="list-group-item">견적서 관리</a>
-  <a href="/sales/approval" class="list-group-item">승인 & PO 관리</a>
+  <a href="/sales/po" class="list-group-item">PO 관리</a>
   <a href="/sales/request" class="list-group-item">의뢰서</a>
 </div>

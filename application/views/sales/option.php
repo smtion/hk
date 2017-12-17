@@ -60,7 +60,7 @@
             </div>
           </div>
         </td>
-        <td><span class="pointer" @click="edit(index)">편집</span></td>
+        <td><button class="btn btn-default btn-sm" @click="edit(index)">편집</button></td>
       </tr>
     </tbody>
   </table>
@@ -310,7 +310,7 @@ var vm = new Vue({
     },
     create: function () {
       if (!vm.validate()) return;
-      
+
       axios.post('/api/sales/option', vm.data).then(function (response) {
         if (response.status == 201) {
           alert('등록되었습니다.');

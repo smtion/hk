@@ -2,6 +2,11 @@
 <link rel="stylesheet" href="/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
 
 <style>
+html, body, .content-wrapper {
+  height: 100%;
+  background-color: #F7F7F7;
+  color: #73879C;
+}
 * {
   word-break: keep-all;
 }
@@ -10,7 +15,14 @@
 }
 
 .navbar {
-  margin-bottom: 0;
+  /*margin-bottom: 0;*/
+  background: #EDEDED;
+  border-bottom: 1px solid #D9DEE4;
+  margin-bottom: 10px;
+  border-radius: 0;
+}
+.navbar-default .navbar-nav>li>a {
+  color: #5A738E;
 }
 .content-wrapper {
   position: relative;
@@ -18,13 +30,13 @@
 }
 .sidebar {
   position: absolute;
-  width: 200px;
+  width: 250px;
   top: 0;
   left: 0;
 }
 .content {
   position: relative;
-  margin-left: 200px;
+  margin-left: 250px;
 }
 
 /* Common */
@@ -48,15 +60,43 @@
 }
 
 /* Sidebar */
+.sidebar {
+  background-color: #2A3F54;
+  color: #ECF0F1;
+  height: 100%;
+}
+.sidebar p {
+  margin: 15px;
+}
+.sidebar .title {
+  font-size: 22px;
+}
+.sidebar .welcome {
+  margin-top: 45px;
+  color: #BAB8B8;
+}
 .sidebar .list-group-item {
-  padding: 5px 15px 5px 45px;
+  padding: 10px 15px 10px 45px;
   border-radius: 0;
+  border: 0;
+  background-color: #2A3F54;
+}
+.sidebar a.list-group-item, .sidebar label.list-group-item {
+  color: #ECF0F1;
+}
+.sidebar a.list-group-item.active {
+  text-shadow: rgba(0,0,0,.25) 0 -1px 0;
+  background: linear-gradient(#334556,#2C4257),#2A3F54;
+  box-shadow: rgba(0,0,0,.25) 0 1px 0, inset rgba(255,255,255,.16) 0 1px 0;
+}
+.sidebar a.list-group-item:hover {
+  background-color: rgba(255,255,255,.06);
 }
 .sidebar .list-group-item-success {
-  padding: 5px 15px;
+  padding: 10px 15px;
 }
 .sidebar .list-group-item-info {
-  padding: 5px 15px 5px 30px;
+  padding: 10px 15px 10px 30px;
 }
 
 

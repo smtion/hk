@@ -33,7 +33,10 @@
         <td>{{ item.name }}</td>
         <td>{{ item.publish_date }}</td>
         <td>{{ item.total | number }}</td>
-        <td></td>
+        <td>
+          <span v-if="!item.approval"><button class="btn btn-default btn-sm" @click="approve(index)">승인</button></span>
+          <span v-else>완료</span>
+        </td>
         <td><a class="btn btn-default btn-sm" :href="'/sales/quotation/' + item.quotation_detail_id" v-if="item.quotation_detail_id">보기</a></td>
         <!-- <td></td> -->
         <td><a class="btn btn-default btn-sm" :href="'/sales/quotation_create/' + item.id">추가</a></td>
@@ -349,6 +352,14 @@ var vm = new Vue({
           alert('변경되었습니다.');
           $('#modalCreate').modal('hide');
           vm.reload();
+        }
+      });
+    },
+    approve: function (index) {
+      axios.patch('/api/sales/quotation_approve/' + vm.list[index].id).then(function (response) {
+        if (response.status == 200) {
+          alert('승인되었습니다.');
+          vm.list[index].approval = 1;
         }
       });
     }

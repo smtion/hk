@@ -6,14 +6,18 @@
 <?php $this->load->view('_layout/css'); ?>
 <?php $this->load->view('_layout/js'); ?>
 </head>
-<body >
-<?php if(is_logged_on()) $this->load->view('_layout/nav'); ?>
+<body>
 <?php if(is_logged_on()) : ?>
   <div class="content-wrapper">
     <?php $this->load->view('_layout/sidebar'); ?>
-    <div class="content container-fluid">
-      <?php $this->load->view('_layout/template'); ?>
+    <div class="content">
+      <?php $this->load->view('_layout/nav'); ?>
+      <div class="container-fluid">
+
+        <?php $this->load->view('_layout/template'); ?>
+      </div>
     </div>
+
   </div>
 <?php else : ?>
   <div class="container">
