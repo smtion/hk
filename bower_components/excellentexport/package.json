@@ -1,0 +1,33 @@
+{
+  "name": "excellentexport",
+  "version": "2.1.0",
+  "description": "Client side JavaScript export to Excel or CSV",
+  "license": "MIT",
+  "homepage": "http://jordiburgos.com/post/2014/excellentexport-javascript-export-to-excel-csv.html",
+  "author": "Jordi Burgos <jordiburgos@gmail.com>",
+  "bugs": "https://github.com/jmaister/excellentexport/issues",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jmaister/excellentexport.git"
+  },
+  "keywords": [
+    "excel",
+    "export",
+    "csv",
+    "javascript",
+    "client",
+    "side"
+  ],
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "main": "dist/excellentexport.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.8.2"
+  }
+}

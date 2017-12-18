@@ -4,14 +4,17 @@
 <script src="/node_modules/vue/dist/vue.js"></script>
 <script src="/node_modules/axios/dist/axios.min.js"></script>
 <script src="/node_modules/vuejs-paginate/dist/index.js"></script>
+<script src="/bower_components/es6-promise/es6-promise.auto.min.js"></script>
 
 <script src="/node_modules/moment/min/moment.min.js"></script>
 <script src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/node_modules/vue-bootstrap-datetimepicker/dist/vue-bootstrap-datetimepicker.min.js"></script>
 <script src="/bower_components/chart.js/dist/Chart.min.js"></script>
+<script src="/bower_components/excellentexport/dist/excellentexport.js"></script>
 
 <script src="/assets/js/html2canvas.min.js"></script>
 <script src="/assets/js/jspdf.min.js"></script>
+
 <!-- <script src="/assets/js/pdf.worker.js"></script> -->
 <script>
 Vue.component('paginate', VuejsPaginate);

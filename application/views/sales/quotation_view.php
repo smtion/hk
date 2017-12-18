@@ -3,7 +3,8 @@
   <div class="title">견적서</div>
 
   <div class="text-right">
-    <button class="btn btn-success btn-sm" @click="download()">PDF 다운로드</button>
+    <a class="btn btn-success btn-sm" :href="'/sales/quotation_detail_download/' + id">엑셀 다운로드</a>
+    <button class="btn btn-success btn-sm" @click="download('pdf')">PDF 다운로드</button>
   </div>
   <br>
 
@@ -362,19 +363,23 @@ var vm = new Vue({
     reload: function () {
       vm.getItem();
     },
-    download: function () {
-      var doc = new jsPDF();
-      var el = document.getElementById("pdf-contents");
-      html2canvas(el, {
-        onrendered : function (canvas) {
-          var imgData = canvas.toDataURL('image/png');
-          vm.pdf = imgData;
-          var doc = new jsPDF('p','mm',[297,210]);
-          // doc.addImage(imgData, 'PNG', 10,10,el.offsetWidth/10,el.offsetHeight/10);
-          doc.addImage(imgData, 'PNG', 10,10,190,el.offsetHeight/(el.offsetWidth/190));
-          doc.save(vm.item.proj_name + '_견적서.pdf');
-        }
-      });
+    download: function (type) {
+      if (type == 'pdf') {
+        var doc = new jsPDF();
+        var el = document.getElementById("pdf-contents");
+        html2canvas(el, {
+          onrendered : function (canvas) {
+            var imgData = canvas.toDataURL('image/png');
+            vm.pdf = imgData;
+            var doc = new jsPDF('p','mm',[297,210]);
+            // doc.addImage(imgData, 'PNG', 10,10,el.offsetWidth/10,el.offsetHeight/10);
+            doc.addImage(imgData, 'PNG', 10,10,190,el.offsetHeight/(el.offsetWidth/190));
+            doc.save(vm.item.proj_name + '_견적서.pdf');
+          }
+        });
+      } else {
+        axios.get('/sales/quotation_detail_download/' + vm.id).then(function (response) {});
+      }
     },
     selectFile: function (file) {
       if (!file.length) return;
